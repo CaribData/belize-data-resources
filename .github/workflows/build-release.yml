@@ -1,0 +1,32 @@
+name: Build & Release — Belize (WB + FAO, versioned)
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g., wb-fao-2025-08-21 or v1.0.0)"
+        required: true
+      name:
+        description: "Release name/title"
+        required: true
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests pandas pyyaml
+      - run: python scripts/build_wb_fao.py
+      - name: Create versioned Release (ZIP + manifest + checksums)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag }}
+          name: ${{ inputs.name }}
+          make_latest: true
+          files: |
+            belize-wb-fao-pack.zip
+            data/_meta/manifest.json
+            data/_meta/checksums.json
