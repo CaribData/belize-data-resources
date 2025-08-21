@@ -20,7 +20,7 @@ jobs:
           python-version: '3.11'
       - run: pip install requests pandas pyyaml
       - run: python scripts/build_wb_fao.py
-      - name: Create versioned Release (ZIP + manifest + checksums)
+      - name: Create versioned Release (ZIP + manifest + checksums + dictionary)
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.tag }}
@@ -30,3 +30,4 @@ jobs:
             belize-wb-fao-pack.zip
             data/_meta/manifest.json
             data/_meta/checksums.json
+            data/_meta/data_dictionary.md
