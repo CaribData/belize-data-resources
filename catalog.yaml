@@ -1,0 +1,28 @@
+country: BLZ
+
+world_bank:
+  license: CC BY 4.0
+  indicators:
+    # Economy
+    NY.GDP.MKTP.CD: economy/gdp_current_usd.csv
+    NY.GDP.PCAP.CD: economy/gdp_per_capita_current_usd.csv
+    FP.CPI.TOTL.ZG: economy/inflation_annual_pct.csv
+    NE.EXP.GNFS.ZS: economy/exports_pct_gdp.csv
+    NE.IMP.GNFS.ZS: economy/imports_pct_gdp.csv
+    # Social / Health / Education / Poverty / Gender / Tourism
+    SP.POP.TOTL: social/population_total.csv
+    SP.DYN.LE00.IN: health/life_expectancy_total_years.csv
+    SH.XPD.CHEX.GD.ZS: health/health_expenditure_pct_gdp.csv
+    SE.SEC.ENRR: education/secondary_enrolment_gross_pct.csv
+    IT.NET.USER.ZS: social/internet_users_pct.csv
+    SI.POV.DDAY: poverty/extreme_poverty_2_15_usd_ppp_pct.csv
+    SG.GEN.PARL.ZS: gender/women_in_parliament_pct.csv
+    ST.INT.ARVL: tourism/international_tourist_arrivals.csv
+
+fao:
+  license: CC BY 4.0
+  downloads:
+    - domain: Food_Security
+      outfile: food/faostat_food_security_belize.csv
+    - domain: Prices
+      outfile: food/faostat_prices_belize.csv
