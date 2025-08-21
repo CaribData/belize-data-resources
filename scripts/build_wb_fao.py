@@ -117,6 +117,24 @@ def fao_fetch(downloads: list):
             print(f"[FAO][WARN] HDX search: {e}")
     return prov, fao_files
 
+
+# ---------------- Fetch examples of messy ----------------
+def fetch_messy(items):
+    prov = []
+    for it in items or []:
+        out = (ROOT / "data" / it["outfile"]); out.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            r = requests.get(it["url"], timeout=180, stream=True); r.raise_for_status()
+            with open(out, "wb") as f:
+                for ch in r.iter_content(8192):
+                    if ch: f.write(ch)
+            prov.append({"source":"MessyURL","url":it["url"],"path":str(out),
+                         "license":it.get("license"),"notes":it.get("notes")})
+            print(f"[MESSY] {it['url']} -> {out}")
+        except Exception as e:
+            print(f"[MESSY][WARN] {it['url']}: {e}")
+    return prov
+
 # ---------------- Metadata & Packaging ----------------
 def write_checks_and_manifest(prov, catalog_text: str):
     files = []
