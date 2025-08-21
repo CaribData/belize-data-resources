@@ -242,6 +242,9 @@ def main():
     print("== FAOSTAT ==")
     fao_prov, fao_files = fao_fetch(cfg["fao"]["downloads"]); prov += fao_prov
 
+    print("== MESSY URLs ==")
+    prov += fetch_messy(cfg.get("messy_urls", []))
+
     # metadata outputs
     write_checks_and_manifest(prov, catalog_text)
     write_data_dictionary(wb_names, fao_files)
