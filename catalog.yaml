@@ -26,3 +26,30 @@ fao:
       outfile: food/faostat_food_security_belize.csv
     - domain: Prices
       outfile: food/faostat_prices_belize.csv
+
+messy_urls:
+  # 1) SIB Tourism Statistics (multi-sheet XLSX with footnotes)
+  - url: https://sib.org.bz/wp-content/uploads/TourismStatistics.xlsx
+    outfile: messy/sib_tourism_statistics.xlsx
+    license: "See SIB site terms"
+    notes: "Multi-sheet; footnotes; inconsistent headers."  # :contentReference[oaicite:0]{index=0}
+
+  # 2) Central Bank: Key Tourism Indicators (merged headers / wide sheet)
+  - url: https://www.centralbank.org.bz/docs/default-source/3.9-general-statistics/3.8.2-key-tourism-indicators-%282001-2023%29/key-tourism-indicators-table.xlsx?sfvrsn=62cb3cfd_18
+    outfile: messy/cbb_key_tourism_indicators.xlsx
+    license: "See Central Bank site terms"
+    notes: "Merged headers; year columns."  # page: :contentReference[oaicite:1]{index=1}  # file: :contentReference[oaicite:2]{index=2}
+
+  # 3) BTB Travel & Tourism Statistics Digest (PDF tables)
+  - url: https://www.belizetourismboard.org/wp-content/uploads/2024/12/2017-Travel-Tourism-Statistics-Digest-Final.pdf
+    outfile: messy/btb_statistics_digest_2017.pdf
+    license: "See BTB site terms"
+    notes: "Tables embedded in PDF; needs extraction."  # :contentReference[oaicite:3]{index=3}
+
+  # 4) OCHA COD-AB Administrative Boundaries (Shapefile ZIP)
+  # Tip: open the page below, click the Shapefile resource, then copy its direct “download” link and paste as url:
+  # https://data.humdata.org/dataset/cod-ab-blz
+  - url: <PASTE the direct Shapefile ZIP resource URL from the COD-AB page>
+    outfile: messy/blz_admin_bounds_cods.zip
+    license: "OCHA/HDX COD terms"
+    notes: "Shapefile; legacy field widths; code lists."  # dataset page: :contentReference[oaicite:4]{index=4}
