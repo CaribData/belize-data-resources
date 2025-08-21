@@ -49,7 +49,7 @@ messy_urls:
   # 4) OCHA COD-AB Administrative Boundaries (Shapefile ZIP)
   # Tip: open the page below, click the Shapefile resource, then copy its direct “download” link and paste as url:
   # https://data.humdata.org/dataset/cod-ab-blz
-  - url: <PASTE the direct Shapefile ZIP resource URL from the COD-AB page>
+  - url: https://data.humdata.org/dataset/8b2c9a50-82d5-4c31-9b4d-9f7bec2934c6/resource/8cc8bfe7-a0f2-49af-9b29-4970167e43b4/download/blz_adminboundaries_tabulardata.xlsx
     outfile: messy/blz_admin_bounds_cods.zip
     license: "OCHA/HDX COD terms"
     notes: "Shapefile; legacy field widths; code lists."  # dataset page: :contentReference[oaicite:4]{index=4}
