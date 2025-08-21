@@ -19,15 +19,15 @@ def sha256_of(path: Path) -> str:
     return h.hexdigest()
 
 def linecount_csv(path: Path) -> int:
-    # count rows excluding header
     with open(path, "rb") as f:
         return max(0, sum(1 for _ in f) - 1)
 
 def backoff(i): time.sleep(2**i)
 
+# ---------------- World Bank ----------------
 def wb_fetch(country_iso3: str, indicators: dict):
     base = "https://api.worldbank.org/v2/country/{cc}/indicator/{code}"
-    prov = []
+    prov, wb_names = [], {}  # wb_names: code -> human name
     for code, relpath in indicators.items():
         url = base.format(cc=country_iso3, code=code)
         params = {"format":"json","per_page":20000}
@@ -38,16 +38,23 @@ def wb_fetch(country_iso3: str, indicators: dict):
             if not rows:
                 print(f"[WB][WARN] {code}: empty"); continue
             df = pd.DataFrame(rows)
+            # try to extract readable indicator name from first row
+            try:
+                ind_name = df["indicator"].iloc[0]["value"]
+            except Exception:
+                ind_name = code
+            wb_names[code] = ind_name
             out = DATA / relpath; out.parent.mkdir(parents=True, exist_ok=True)
             df_out = df[["indicator","country","date","value"]].copy()
             df_out["indicator_code"] = code
             df_out.to_csv(out, index=False)
-            prov.append({"source":"WorldBank WDI","indicator":code,"url":r.url,"path":str(out)})
+            prov.append({"source":"WorldBank WDI","indicator":code,"indicator_name":ind_name,"url":r.url,"path":str(out)})
             print(f"[WB] {code} -> {out}")
         except Exception as e:
             print(f"[WB][WARN] {code}: {e}")
-    return prov
+    return prov, wb_names
 
+# ---------------- FAOSTAT ----------------
 def save_bytes(url, outfile, params=None, tries=3, timeout=120):
     outfile = Path(outfile); outfile.parent.mkdir(parents=True, exist_ok=True)
     last = None
@@ -66,7 +73,7 @@ def save_bytes(url, outfile, params=None, tries=3, timeout=120):
 
 def fao_fetch(downloads: list):
     """Try FAOSTAT CSV → JSON; fallback to HDX mirror (CSV) if FAO is down."""
-    prov = []
+    prov, fao_files = [], []  # fao_files: list of {"domain","path"}
     for item in downloads:
         domain = item["domain"]            # Food_Security or Prices
         out = DATA / item["outfile"]
@@ -74,6 +81,7 @@ def fao_fetch(downloads: list):
         csv_url = f"https://fenixservices.fao.org/faostat/api/v1/en/{domain}/data"
         if save_bytes(csv_url, out, params={"area_code":"084","downloadFormat":"csv"}):
             prov.append({"source":"FAOSTAT","domain":domain,"url":csv_url,"path":str(out)})
+            fao_files.append({"domain":domain, "path": str(out)})
             print(f"[FAO] {domain} CSV -> {out}"); continue
         # 2) JSON endpoint → CSV
         try:
@@ -83,6 +91,7 @@ def fao_fetch(downloads: list):
             if data:
                 pd.DataFrame(data).to_csv(out, index=False)
                 prov.append({"source":"FAOSTAT","domain":domain,"url":json_url,"path":str(out)})
+                fao_files.append({"domain":domain, "path": str(out)})
                 print(f"[FAO] {domain} JSON -> {out}"); continue
         except Exception as e:
             print(f"[FAO][WARN] {domain} JSON: {e}")
@@ -99,14 +108,16 @@ def fao_fetch(downloads: list):
                         if save_bytes(rsrc["url"], out):
                             prov.append({"source":"HDX (FAOSTAT mirror)","title":pkg.get("title"),
                                          "url":rsrc["url"],"path":str(out)})
+                            fao_files.append({"domain":domain, "path": str(out)})
                             print(f"[FAO][HDX] {domain} -> {out}")
                             got = True; break
                 if got: break
             if not got: print(f"[FAO][ERROR] No HDX CSV found for {domain}.")
         except Exception as e:
             print(f"[FAO][WARN] HDX search: {e}")
-    return prov
+    return prov, fao_files
 
+# ---------------- Metadata & Packaging ----------------
 def write_checks_and_manifest(prov, catalog_text: str):
     files = []
     for p in DATA.rglob("*.csv"):
@@ -129,15 +140,76 @@ def write_checks_and_manifest(prov, catalog_text: str):
     (META/"manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     print(f"[META] wrote checksums.json & manifest.json")
 
+def write_data_dictionary(wb_names: dict, fao_files: list):
+    """Create data/_meta/data_dictionary.md (WB indicators + FAO file summaries)."""
+    lines = []
+    lines.append("# Belize Data Pack — Data Dictionary\n")
+    lines.append("This document is auto-generated at build time.\n")
+
+    # World Bank section
+    if wb_names:
+        lines.append("## World Bank indicators\n")
+        lines.append("| Code | Indicator name | CSV path | Reference |\n|---|---|---|---|\n")
+        for code, name in sorted(wb_names.items()):
+            path = _guess_wb_path_for(code)
+            link = f"https://data.worldbank.org/indicator/{code}"
+            lines.append(f"| `{code}` | {name} | `{path}` | {link} |\n")
+        lines.append("\n**Common columns:** `indicator` (object in source; name string in CSV), `country`, `date` (year), `value`, `indicator_code`.\n")
+
+    # FAOSTAT section
+    if fao_files:
+        lines.append("## FAOSTAT files\n")
+        for item in fao_files:
+            p = Path(item["path"])
+            lines.append(f"### {item['domain']} — `{p.relative_to(ROOT)}`\n")
+            # Try to inspect columns and sample units
+            try:
+                df = pd.read_csv(p, nrows=200)
+                cols = ", ".join(df.columns[:20]) + ("…" if len(df.columns) > 20 else "")
+                # Pick a likely unit column
+                unit_cols = [c for c in df.columns if c.lower() in ("unit","units")]
+                unit_note = ""
+                if unit_cols:
+                    samples = df[unit_cols[0]].dropna().astype(str).unique()[:5]
+                    unit_note = f"  \n**Units (sample):** {', '.join(samples)}"
+                lines.append(f"**Columns (first 20):** {cols}{unit_note}\n")
+            except Exception as e:
+                lines.append(f"_Could not inspect columns (read error: {e})._\n")
+        lines.append("\n**Note:** FAOSTAT schemas vary by domain. Expect fields like `Year`, `Area`, `Item`, `Element`, `Value`, `Unit`.\n")
+
+    out = META / "data_dictionary.md"
+    out.write_text("\n".join(lines), encoding="utf-8")
+    print(f"[META] data dictionary -> {out}")
+    return out
+
+def _guess_wb_path_for(code: str) -> str:
+    # map known codes to the relative CSV paths used in catalog.yaml
+    mapping = {
+        "NY.GDP.MKTP.CD":"data/economy/gdp_current_usd.csv",
+        "NY.GDP.PCAP.CD":"data/economy/gdp_per_capita_current_usd.csv",
+        "FP.CPI.TOTL.ZG":"data/economy/inflation_annual_pct.csv",
+        "NE.EXP.GNFS.ZS":"data/economy/exports_pct_gdp.csv",
+        "NE.IMP.GNFS.ZS":"data/economy/imports_pct_gdp.csv",
+        "SP.POP.TOTL":"data/social/population_total.csv",
+        "SP.DYN.LE00.IN":"data/health/life_expectancy_total_years.csv",
+        "SH.XPD.CHEX.GD.ZS":"data/health/health_expenditure_pct_gdp.csv",
+        "SE.SEC.ENRR":"data/education/secondary_enrolment_gross_pct.csv",
+        "IT.NET.USER.ZS":"data/social/internet_users_pct.csv",
+        "SI.POV.DDAY":"data/poverty/extreme_poverty_2_15_usd_ppp_pct.csv",
+        "SG.GEN.PARL.ZS":"data/gender/women_in_parliament_pct.csv",
+        "ST.INT.ARVL":"data/tourism/international_tourist_arrivals.csv",
+    }
+    return mapping.get(code, f"data/<unknown_path_for_{code}>.csv")
+
 def zip_output(zipname="belize-wb-fao-pack.zip"):
     zpath = ROOT / zipname
     with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
         for p in (ROOT/"data").rglob("*"):
             if p.is_file(): z.write(p, p.relative_to(ROOT))
         z.write(ROOT/"catalog.yaml", "catalog.yaml")
-        # also include manifest at root for convenience
         z.write(ROOT/"data/_meta/manifest.json", "_meta/manifest.json")
         z.write(ROOT/"data/_meta/checksums.json", "_meta/checksums.json")
+        z.write(ROOT/"data/_meta/data_dictionary.md", "_meta/data_dictionary.md")
     print(f"[ZIP] {zpath}")
     return str(zpath)
 
@@ -145,11 +217,17 @@ def main():
     catalog_text = (ROOT/"catalog.yaml").read_text(encoding="utf-8")
     cfg = yaml.safe_load(catalog_text)
     prov = []
+
     print("== World Bank ==")
-    prov += wb_fetch(cfg["country"], cfg["world_bank"]["indicators"])
+    wb_prov, wb_names = wb_fetch(cfg["country"], cfg["world_bank"]["indicators"]); prov += wb_prov
+
     print("== FAOSTAT ==")
-    prov += fao_fetch(cfg["fao"]["downloads"])
+    fao_prov, fao_files = fao_fetch(cfg["fao"]["downloads"]); prov += fao_prov
+
+    # metadata outputs
     write_checks_and_manifest(prov, catalog_text)
+    write_data_dictionary(wb_names, fao_files)
+
     z = zip_output()
     print("DONE:", z)
 
