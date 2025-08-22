@@ -9,7 +9,9 @@ on:
       - "requirements.txt"
   workflow_dispatch:
   workflow_run:
-    workflows: ["CaribData Open Data — Build & Release"]
+    workflows:
+      - "CaribData Open Data — Build & Release"
+      - "CaribData Messy Data — Fetch & Bundle"
     types: [completed]
 
 permissions:
@@ -26,32 +28,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - name: Install MkDocs + deps
         run: |
           pip install -r requirements.txt
           mkdocs --version
-
       - name: Show mkdocs.yml (debug)
         run: |
           echo "----- mkdocs.yml -----"
           cat mkdocs.yml
           echo "----------------------"
-
       - name: Build site
         run: mkdocs build --strict
-
       - name: List built site (debug)
         run: |
           echo "Built files in ./site:"
           find site -maxdepth 2 -type f | head -n 50
           echo "Grepping title from homepage:"
           grep -i "<title>" site/index.html || true
-
       - name: Deploy to GitHub Pages (force clean)
         uses: peaceiris/actions-gh-pages@v3
         with:
