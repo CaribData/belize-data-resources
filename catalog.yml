@@ -1,8 +1,6 @@
-# Human-friendly catalog driving the build. Non-coders can edit this file.
-
 project:
-  name: Belize & Neighbours — Open Data Resources
-  countries: ["BZ", "JM", "TT", "GY"]   # ISO-2 codes (WB API format)
+  name: CaribData Open Data Repository
+  countries: ["BZ", "JM", "TT", "GY"]   # ISO-2 for World Bank
   out_dir: "data"
   cache_dir: ".cache"
   cache_ttl_hours: 24
@@ -12,8 +10,6 @@ world_bank:
   api_base: "https://api.worldbank.org/v2"
   format: "json"
   per_page: 20000
-  # Non-coders can add/remove indicators here. Keep codes on the left,
-  # and fill in optional metadata to improve dataset cards.
   indicators:
     # Economy
     "NY.GDP.MKTP.CD": {name: "GDP (current US$)", unit: "US$", group: "Economy"}
@@ -23,63 +19,48 @@ world_bank:
     "GC.XPN.TOTL.GD.ZS": {name: "Expense (% of GDP)", unit: "%", group: "Economy"}
     "BN.CAB.XOKA.GD.ZS": {name: "Current account balance (% of GDP)", unit: "%", group: "Economy"}
     "FP.CPI.TOTL.ZG": {name: "Inflation, consumer prices (annual %)", unit: "%", group: "Economy"}
-    # Social
-    "SP.POP.TOTL": {name: "Population, total", unit: "people", group: "Social"}
-    "SP.URB.TOTL.IN.ZS": {name: "Urban population (% of total)", unit: "%", group: "Social"}
-    "SI.POV.DDAY": {name: "Poverty headcount ratio at $2.15 a day (2017 PPP) (% of population)", unit: "%", group: "Poverty"}
-    "SI.POV.UMIC": {name: "Poverty headcount ratio at national poverty lines (% of population)", unit: "%", group: "Poverty"}
-    # Health
-    "SP.DYN.LE00.IN": {name: "Life expectancy at birth, total (years)", unit: "years", group: "Health"}
-    "SH.XPD.CHEX.GD.ZS": {name: "Current health expenditure (% of GDP)", unit: "%", group: "Health"}
-    "SH.STA.MMRT": {name: "Maternal mortality ratio (per 100,000 live births)", unit: "per 100k", group: "Health"}
-    "SH.DTH.COMM.ZS": {name: "Deaths due to communicable diseases and maternal, prenatal and nutrition conditions (% of total)", unit: "%", group: "Health"}
-    # Education
-    "SE.ADT.LITR.ZS": {name: "Literacy rate, adult total (% of people ages 15+)", unit: "%", group: "Education"}
-    "SE.PRM.NENR": {name: "Net enrollment rate, primary (% of primary school age children)", unit: "%", group: "Education"}
-    "SE.SEC.ENRR": {name: "School enrollment, secondary (% gross)", unit: "%", group: "Education"}
-    "SE.TER.ENRR": {name: "School enrollment, tertiary (% gross)", unit: "%", group: "Education"}
-    # Gender
-    "SL.TLF.CACT.FE.ZS": {name: "Female labor force participation rate (% of female population ages 15+)", unit: "%", group: "Gender"}
-    "SG.GEN.PARL.ZS": {name: "Proportion of seats held by women in national parliaments (%)", unit: "%", group: "Gender"}
-    "SP.ADO.TFRT": {name: "Adolescent fertility rate (births per 1,000 women ages 15-19)", unit: "per 1k", group: "Gender"}
-    # Tourism (proxy WB indicators often used)
-    "ST.INT.ARVL": {name: "International tourism, number of arrivals", unit: "arrivals", group: "Tourism"}
-    "ST.INT.RCPT.CD": {name: "International tourism, receipts (current US$)", unit: "US$", group: "Tourism"}
-    "ST.INT.XPND.CD": {name: "International tourism, expenditures (current US$)", unit: "US$", group: "Tourism"}
-    # Additional economy/employment to reach >50 total across sets
-    "SL.UEM.TOTL.ZS": {name: "Unemployment, total (% of total labor force)", unit: "%", group: "Economy"}
-    "SL.UEM.1524.ZS": {name: "Unemployment, youth (% ages 15–24)", unit: "%", group: "Economy"}
-    "SL.EMP.TOTL.SP.ZS": {name: "Employment to population ratio, 15+, total (%)", unit: "%", group: "Economy"}
-    "SL.TLF.TOTL.IN": {name: "Labor force, total", unit: "people", group: "Economy"}
     "NE.GDI.TOTL.ZS": {name: "Gross capital formation (% of GDP)", unit: "%", group: "Economy"}
     "GC.TAX.TOTL.GD.ZS": {name: "Tax revenue (% of GDP)", unit: "%", group: "Economy"}
     "NE.TRD.GNFS.ZS": {name: "Trade (% of GDP)", unit: "%", group: "Economy"}
     "NV.AGR.TOTL.ZS": {name: "Agriculture, forestry, and fishing, value added (% of GDP)", unit: "%", group: "Economy"}
-    "NV.IND.TOTL.ZS": {name: "Industry (including construction), value added (% of GDP)", unit: "%", group: "Economy"}
+    "NV.IND.TOTL.ZS": {name: "Industry (incl. construction), value added (% of GDP)", unit: "%", group: "Economy"}
     "NV.SRV.TETC.ZS": {name: "Services, value added (% of GDP)", unit: "%", group: "Economy"}
-    # Social/Infrastructure
+    "SL.UEM.TOTL.ZS": {name: "Unemployment, total (% of total labor force)", unit: "%", group: "Economy"}
+    "SL.UEM.1524.ZS": {name: "Unemployment, youth (% ages 15–24)", unit: "%", group: "Economy"}
+    "SL.EMP.TOTL.SP.ZS": {name: "Employment to population ratio, 15+, total (%)", unit: "%", group: "Economy"}
+    "SL.TLF.TOTL.IN": {name: "Labor force, total", unit: "people", group: "Economy"}
+
+    # Social
+    "SP.POP.TOTL": {name: "Population, total", unit: "people", group: "Social"}
+    "SP.URB.TOTL.IN.ZS": {name: "Urban population (% of total)", unit: "%", group: "Social"}
     "EG.ELC.ACCS.ZS": {name: "Access to electricity (% of population)", unit: "%", group: "Social"}
     "IT.NET.USER.ZS": {name: "Individuals using the Internet (% of population)", unit: "%", group: "Social"}
-    # Health more
-    "SH.IMM.MEAS": {name: "Immunization, measles (% of children ages 12-23 months)", unit: "%", group: "Health"}
+
+    # Health
+    "SP.DYN.LE00.IN": {name: "Life expectancy at birth, total (years)", unit: "years", group: "Health"}
+    "SH.XPD.CHEX.GD.ZS": {name: "Current health expenditure (% of GDP)", unit: "%", group: "Health"}
     "SH.XPD.CHEX.PC.CD": {name: "Current health expenditure per capita (current US$)", unit: "US$", group: "Health"}
     "SP.DYN.TFRT.IN": {name: "Fertility rate, total (births per woman)", unit: "", group: "Health"}
     "SH.MED.BEDS.ZS": {name: "Hospital beds (per 1,000 people)", unit: "per 1k", group: "Health"}
-    # Education more
+    "SH.IMM.MEAS": {name: "Immunization, measles (% of children 12–23 months)", unit: "%", group: "Health"}
+
+    # Education
+    "SE.ADT.LITR.ZS": {name: "Literacy rate, adult total (% ages 15+)", unit: "%", group: "Education"}
+    "SE.PRM.NENR": {name: "Net enrollment rate, primary (% of primary school age children)", unit: "%", group: "Education"}
+    "SE.SEC.ENRR": {name: "School enrollment, secondary (% gross)", unit: "%", group: "Education"}
+    "SE.TER.ENRR": {name: "School enrollment, tertiary (% gross)", unit: "%", group: "Education"}
     "SE.XPD.TOTL.GD.ZS": {name: "Government expenditure on education, total (% of GDP)", unit: "%", group: "Education"}
     "SE.PRM.CMPT.ZS": {name: "Primary completion rate, total (% of relevant age group)", unit: "%", group: "Education"}
-    # Gender more
-    "SG.GEN.LSOM.ZS": {name: "Women owning a bank account (% ages 15+)", unit: "%", group: "Gender"}
-    "SP.DYN.CONU.ZS": {name: "Contraceptive prevalence (% of women ages 15-49)", unit: "%", group: "Gender"}
 
-faostat_fbs:
-  enabled: true
-  api_base: "https://fenixservices.fao.org/api/faostat/api/v1/en/FBS"
-  # Belize ISO3 for FAOSTAT is BLZ; for neighbours JAM, TTO, GUY
-  countries_iso3: ["BLZ", "JAM", "TTO", "GUY"]
-  elements: ["Food supply (kcal/capita/day)", "Food supply quantity (kg/capita/yr)"]
-  out_folder: "faostat_fbs"
+    # Poverty & Gender
+    "SI.POV.DDAY": {name: "Poverty headcount ratio at $2.15/day (2017 PPP) (% of pop.)", unit: "%", group: "Poverty"}
+    "SI.POV.UMIC": {name: "National poverty headcount ratio (% of pop.)", unit: "%", group: "Poverty"}
+    "SI.POV.GINI": {name: "Gini index", unit: "", group: "Poverty"}
+    "SL.TLF.CACT.FE.ZS": {name: "Female labor force participation (% ages 15+)", unit: "%", group: "Gender"}
+    "SG.GEN.PARL.ZS": {name: "Women in national parliaments (% of seats)", unit: "%", group: "Gender"}
+    "SP.ADO.TFRT": {name: "Adolescent fertility rate (per 1,000 women 15–19)", unit: "per 1k", group: "Gender"}
 
-local:
-  enabled: false
-  sources: []
+    # Tourism
+    "ST.INT.ARVL": {name: "International tourism, number of arrivals", unit: "arrivals", group: "Tourism"}
+    "ST.INT.RCPT.CD": {name: "International tourism, receipts (current US$)", unit: "US$", group: "Tourism"}
+    "ST.INT.XPND.CD": {name: "International tourism, expenditures (current US$)", unit: "US$", group: "Tourism"
