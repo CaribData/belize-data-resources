@@ -1,55 +1,85 @@
-country: BLZ
+# catalog.yml
+paths:
+  world_bank_dir: data/world_bank
+  faostat_fbs_dir: data/faostat_fbs
 
 world_bank:
-  license: CC BY 4.0
+  country: BZ
   indicators:
     # Economy
-    NY.GDP.MKTP.CD: economy/gdp_current_usd.csv
-    NY.GDP.PCAP.CD: economy/gdp_per_capita_current_usd.csv
-    FP.CPI.TOTL.ZG: economy/inflation_annual_pct.csv
-    NE.EXP.GNFS.ZS: economy/exports_pct_gdp.csv
-    NE.IMP.GNFS.ZS: economy/imports_pct_gdp.csv
-    # Social / Health / Education / Poverty / Gender / Tourism
-    SP.POP.TOTL: social/population_total.csv
-    SP.DYN.LE00.IN: health/life_expectancy_total_years.csv
-    SH.XPD.CHEX.GD.ZS: health/health_expenditure_pct_gdp.csv
-    SE.SEC.ENRR: education/secondary_enrolment_gross_pct.csv
-    IT.NET.USER.ZS: social/internet_users_pct.csv
-    SI.POV.DDAY: poverty/extreme_poverty_2_15_usd_ppp_pct.csv
-    SG.GEN.PARL.ZS: gender/women_in_parliament_pct.csv
-    ST.INT.ARVL: tourism/international_tourist_arrivals.csv
+    - { code: NY.GDP.MKTP.CD,        category: Economy,  label: "GDP (current US$)" }
+    - { code: NY.GDP.MKTP.KD.ZG,     category: Economy,  label: "GDP growth (annual %)" }
+    - { code: NY.GDP.PCAP.CD,        category: Economy,  label: "GDP per capita (current US$)" }
+    - { code: NE.EXP.GNFS.ZS,        category: Economy,  label: "Exports of goods and services (% of GDP)" }
+    - { code: NE.IMP.GNFS.ZS,        category: Economy,  label: "Imports of goods and services (% of GDP)" }
+    - { code: BN.CAB.XOKA.GD.ZS,     category: Economy,  label: "Current account balance (% of GDP)" }
+    - { code: FP.CPI.TOTL.ZG,        category: Economy,  label: "Inflation, consumer prices (annual %)" }
+    - { code: FP.CPI.TOTL,           category: Economy,  label: "Consumer price index (2010=100)" }
+    - { code: GC.XPN.TOTL.GD.ZS,     category: Economy,  label: "Expense (% of GDP)" }
+    - { code: GC.REV.XGRT.GD.ZS,     category: Economy,  label: "Revenue, grants (% of GDP)" }
+    - { code: NE.CON.PRVT.KD.ZG,     category: Economy,  label: "Household final consumption growth" }
+    - { code: NE.GDI.TOTL.ZS,        category: Economy,  label: "Gross capital formation (% of GDP)" }
+    - { code: NV.AGR.TOTL.ZS,        category: Economy,  label: "Agriculture, value added (% of GDP)" }
+    - { code: NV.IND.TOTL.ZS,        category: Economy,  label: "Industry, value added (% of GDP)" }
+    - { code: NV.SRV.TETC.ZS,        category: Economy,  label: "Services, etc., value added (% of GDP)" }
+    - { code: BX.KLT.DINV.WD.GD.ZS,  category: Economy,  label: "FDI, net inflows (% of GDP)" }
 
-fao:
-  license: CC BY 4.0
-  downloads:
-    - domain: Food_Security
-      outfile: food/faostat_food_security_belize.csv
-    - domain: Prices
-      outfile: food/faostat_prices_belize.csv
+    # Social
+    - { code: SP.POP.TOTL,           category: Social,    label: "Population, total" }
+    - { code: SP.POP.GROW,           category: Social,    label: "Population growth (annual %)" }
+    - { code: SP.URB.TOTL.IN.ZS,     category: Social,    label: "Urban population (% of total)" }
+    - { code: EG.ELC.ACCS.ZS,        category: Social,    label: "Access to electricity (% of population)" }
+    - { code: IT.NET.USER.ZS,        category: Social,    label: "Individuals using the Internet (% of pop.)" }
+    - { code: SL.UEM.TOTL.ZS,        category: Social,    label: "Unemployment, total (% of labor force)" }
+    - { code: SL.UEM.1524.ZS,        category: Social,    label: "Unemployment, ages 15–24 (% of LF)" }
+    - { code: SI.YTH.NEET.ZS,        category: Social,    label: "Youth not in employment, education or training (% ages 15–24)" }
+    - { code: SI.DST.10TH.20,        category: Social,    label: "Income share held by highest 10%" }
+    - { code: SI.DST.05TH.20,        category: Social,    label: "Income share held by lowest 20%" }
 
-messy_urls:
-  # 1) SIB Tourism Statistics (multi-sheet XLSX with footnotes)
-  - url: https://sib.org.bz/wp-content/uploads/TourismStatistics.xlsx
-    outfile: messy/sib_tourism_statistics.xlsx
-    license: "See SIB site terms"
-    notes: "Multi-sheet; footnotes; inconsistent headers."  # :contentReference[oaicite:0]{index=0}
+    # Health
+    - { code: SP.DYN.LE00.IN,        category: Health,    label: "Life expectancy at birth, total (years)" }
+    - { code: SP.DYN.IMRT.IN,        category: Health,    label: "Infant mortality rate (per 1,000 live births)" }
+    - { code: SH.DYN.MORT,           category: Health,    label: "Mortality rate, under-5 (per 1,000) " }
+    - { code: SH.XPD.CHEX.GD.ZS,     category: Health,    label: "Current health expenditure (% of GDP)" }
+    - { code: SH.XPD.CHEX.PC.CD,     category: Health,    label: "Current health expenditure per capita (US$)" }
+    - { code: SH.H2O.SMDW.ZS,        category: Health,    label: "People with safely managed drinking water services (% of pop.)" }
+    - { code: SH.STA.SMSS.ZS,        category: Health,    label: "People with safely managed sanitation services (% of pop.)" }
+    - { code: SH.STA.ACSN,           category: Health,    label: "People using at least basic sanitation services (% of pop.)" }
+    - { code: SH.TBS.INCD,           category: Health,    label: "Incidence of tuberculosis (per 100,000)" }
 
-  # 2) Central Bank: Key Tourism Indicators (merged headers / wide sheet)
-  - url: https://www.centralbank.org.bz/docs/default-source/3.9-general-statistics/3.8.2-key-tourism-indicators-%282001-2023%29/key-tourism-indicators-table.xlsx?sfvrsn=62cb3cfd_18
-    outfile: messy/cbb_key_tourism_indicators.xlsx
-    license: "See Central Bank site terms"
-    notes: "Merged headers; year columns."  # page: :contentReference[oaicite:1]{index=1}  # file: :contentReference[oaicite:2]{index=2}
+    # Education
+    - { code: SE.PRM.ENRR,           category: Education, label: "School enrollment, primary (% gross)" }
+    - { code: SE.SEC.ENRR,           category: Education, label: "School enrollment, secondary (% gross)" }
+    - { code: SE.TER.ENRR,           category: Education, label: "School enrollment, tertiary (% gross)" }
+    - { code: SE.ADT.LITR.ZS,        category: Education, label: "Adult literacy rate, total (% ages 15+)" }
+    - { code: SE.ADT.LITR.FE.ZS,     category: Education, label: "Adult literacy rate, female (% ages 15+)" }
+    - { code: SE.ADT.LITR.MA.ZS,     category: Education, label: "Adult literacy rate, male (% ages 15+)" }
+    - { code: SE.PRM.CMPT.ZS,        category: Education, label: "Primary completion rate, total (% of relevant age group)" }
+    - { code: SE.SEC.CMPT.LO.ZS,     category: Education, label: "Lower secondary completion rate (% of relevant age group)" }
 
-  # 3) BTB Travel & Tourism Statistics Digest (PDF tables)
-  - url: https://www.belizetourismboard.org/wp-content/uploads/2024/12/2017-Travel-Tourism-Statistics-Digest-Final.pdf
-    outfile: messy/btb_statistics_digest_2017.pdf
-    license: "See BTB site terms"
-    notes: "Tables embedded in PDF; needs extraction."  # :contentReference[oaicite:3]{index=3}
+    # Poverty
+    - { code: SI.POV.DDAY,           category: Poverty,   label: "Poverty headcount ratio at $2.15/day (2017 PPP) (% of pop.)" }
+    - { code: SI.POV.NAHC,           category: Poverty,   label: "National poverty headcount ratio (% of pop.)" }
+    - { code: SI.POV.GINI,           category: Poverty,   label: "Gini index" }
 
-  # 4) OCHA COD-AB Administrative Boundaries (Shapefile ZIP)
-  # Tip: open the page below, click the Shapefile resource, then copy its direct “download” link and paste as url:
-  # https://data.humdata.org/dataset/cod-ab-blz
-  - url: https://data.humdata.org/dataset/8b2c9a50-82d5-4c31-9b4d-9f7bec2934c6/resource/8cc8bfe7-a0f2-49af-9b29-4970167e43b4/download/blz_adminboundaries_tabulardata.xlsx
-    outfile: messy/blz_admin_bounds_cods.zip
-    license: "OCHA/HDX COD terms"
-    notes: "Shapefile; legacy field widths; code lists."  # dataset page: :contentReference[oaicite:4]{index=4}
+    # Gender
+    - { code: SG.GEN.PARL.ZS,        category: Gender,    label: "Seats held by women in national parliaments (% of total)" }
+    - { code: SL.TLF.CACT.FE.ZS,     category: Gender,    label: "Female labor force participation rate (% ages 15+, modeled ILO)" }
+    - { code: SL.EMP.TOTL.SP.FE.NE.ZS, category: Gender,  label: "Employment to population ratio, 15+, female (%)" }
+    - { code: SP.ADO.TFRT,           category: Gender,    label: "Adolescent fertility rate (births per 1,000 women ages 15–19)" }
+    - { code: SP.MTR.1519.ZS,        category: Gender,    label: "Adolescent fertility, modeled estimate (% of female pop. 15–19)" }
+
+    # Tourism / Transport
+    - { code: ST.INT.ARVL,           category: Tourism,   label: "International tourism, number of arrivals" }
+    - { code: ST.INT.RCPT.CD,        category: Tourism,   label: "International tourism, receipts (current US$)" }
+    - { code: ST.INT.TRNX.CD,        category: Tourism,   label: "International tourism, expenditures (current US$)" }
+    - { code: IS.AIR.PSGR,           category: Tourism,   label: "Air transport, passengers carried" }
+    - { code: IS.AIR.GOOD.MT.K1,     category: Tourism,   label: "Air transport, freight (million ton-km)" }
+
+faostat:
+  food_balance_sheets:
+    domains:
+      - FBS/FBS          # legacy FBS
+      - FBS_SUA/FBS_SUA  # supply-utilization accounts FBS
+      - FBSCB/FBSCB      # combined balance (if available)
+    area_filter: Belize
