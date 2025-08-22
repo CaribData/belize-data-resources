@@ -1,0 +1,5 @@
+.cache/
+site/
+data/**/_manifest.json
+data/**/_dictionary.csv
+data/**/_freshness.json
