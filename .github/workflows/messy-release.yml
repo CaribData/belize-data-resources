@@ -62,7 +62,6 @@ jobs:
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "title=$TITLE" >> $GITHUB_OUTPUT
           echo "prerelease=$PRERELEASE" >> $GITHUB_OUTPUT
-
       - name: Create annotated tag (manual runs only)
         if: github.event_name == 'workflow_dispatch'
         env:
@@ -91,13 +90,8 @@ jobs:
           set -euo pipefail
           mkdir -p "ghp/data/messy/${TAG}"
           rsync -a "data/messy/" "ghp/data/messy/${TAG}/"
-          python - <<'PY'
-import json, os, datetime, pathlib
-tag = os.environ["TAG"]
-ts  = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-root = pathlib.Path("ghp") / "data" / "messy"
-(root / tag / "_index.json").write_text(json.dumps({"tag": tag, "published_at": ts}, indent=2))
-PY
+          ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          printf '{\n  "tag": "%s",\n  "published_at": "%s"\n}\n' "$TAG" "$ts" > "ghp/data/messy/${TAG}/_index.json"
           cd ghp
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -105,7 +99,6 @@ PY
           git commit -m "Publish Messy Data for ${TAG} to Pages" || echo "No changes to commit"
           git push
 
-      # Release: single ZIP + small assets + checksums + index
       - name: Package ZIP, extract key assets + checksums + index
         run: |
           set -euo pipefail
@@ -116,22 +109,18 @@ PY
           cp data/messy/_manifest.json   dist/messy_manifest.json   || true
           cp data/messy/_report.json     dist/messy_report.json     || true
           cp data/messy/_dataset_card.md dist/messy_dataset_card.md || true
-          (cd dist && shasum -a 256 *.zip *.json *.md 2>/dev/null | tee SHA256SUMS.txt || true)
-          python - <<'PY'
-import json, hashlib, os
-items=[]
-for fn in sorted(os.listdir("dist")):
-    p=os.path.join("dist", fn)
-    if os.path.isfile(p):
-        h=hashlib.sha256()
-        with open(p,'rb') as f:
-            for chunk in iter(lambda: f.read(1<<20), b''):
-                h.update(chunk)
-        items.append({"name": fn, "size_bytes": os.path.getsize(p), "sha256": h.hexdigest()})
-with open("dist/ASSET_INDEX.json","w") as f:
-    json.dump({"tag": os.environ.get("TAG",""), "assets": items}, f, indent=2)
-print("Indexed", len(items), "assets")
-PY
+          (cd dist && sha256sum *.zip *.json *.md 2>/dev/null | tee SHA256SUMS.txt || true)
+          python -c "import json,hashlib,os,glob; items=[];
+for p in sorted(glob.glob('dist/*')):
+  if os.path.isfile(p):
+    h=hashlib.sha256()
+    with open(p,'rb') as f:
+      while True:
+        b=f.read(1<<20)
+        if not b: break
+        h.update(b)
+    items.append({'name': os.path.basename(p),'size_bytes': os.path.getsize(p),'sha256': h.hexdigest()})
+open('dist/ASSET_INDEX.json','w').write(json.dumps({'tag': '${{ steps.meta.outputs.tag }}','assets': items}, indent=2))"
       - name: Create/Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
