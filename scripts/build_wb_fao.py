@@ -1,234 +1,294 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-build_wb_fwo.py
-Belize data harvester for World Bank + FAOSTAT (Food Balance Sheets).
+Build script for World Bank + FAOSTAT Food Balance Sheets (multi-country).
 
-- Reads ./catalog.yml
-- Writes CSVs + a small JSON manifest per source
-- Friendly for non-coders (all knobs live in catalog.yml)
+- Reads config from catalog.yml
+- Pulls World Bank indicators for listed ISO2 countries
+- Pulls FAOSTAT FBS for listed ISO3 countries
+- Writes: tidy CSVs, per-source manifests, indicator dictionary, and freshness stamp
+- Uses simple 24h on-disk cache to reduce API calls
+- Produces dataset cards if missing
 
-Requirements: PyYAML (yaml), requests
+Outputs:
+  data/world_bank/{ISO2}/<indicator>.csv
+  data/world_bank/_manifest.json
+  data/world_bank/_dictionary.csv
+  data/faostat_fbs/<ISO3>_fbs.csv
+  data/faostat_fbs/_manifest.json
+  data/_freshness.json
 """
-from __future__ import annotations
-import csv
-import json
+
 import os
-import pathlib
 import time
-import typing as t
-from datetime import datetime
+import json
+import yaml
+import csv
+import hashlib
+import pathlib
+from datetime import datetime, timedelta, timezone
+from typing import Dict, Any, List, Tuple
 
 import requests
-import yaml
+import pandas as pd
 
-# ----------------------------- helpers ---------------------------------------
+ROOT = pathlib.Path(__file__).resolve().parents[1]  # repo root
+CATALOG = ROOT / "catalog.yml"
 
-def utc_now() -> str:
-    return datetime.utcnow().isoformat(timespec="seconds") + "Z"
 
-def ensure_dir(p: pathlib.Path) -> None:
+def load_config() -> Dict[str, Any]:
+    with open(CATALOG, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+
+def ensure_dir(p: pathlib.Path):
     p.mkdir(parents=True, exist_ok=True)
 
-def retry_get(url: str, params: dict | None = None, tries: int = 4, backoff_s: float = 0.8, timeout: int = 60):
-    last = None
-    for attempt in range(1, tries + 1):
-        try:
-            r = requests.get(url, params=params, timeout=timeout)
-            r.raise_for_status()
-            return r
-        except Exception as e:
-            last = e
-            if attempt == tries:
-                raise
-            time.sleep(backoff_s * attempt)
-    raise last  # pragma: no cover
 
-def read_catalog(path: str = "catalog.yml") -> dict:
-    with open(path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
+def sha1(s: str) -> str:
+    return hashlib.sha1(s.encode("utf-8")).hexdigest()
 
-def normalize_str(x) -> str:
-    return str(x).strip().lower() if x is not None else ""
 
-# ----------------------- World Bank harvesting --------------------------------
+def cache_get(cache_dir: pathlib.Path, key: str, ttl_hours: int):
+    f = cache_dir / f"{sha1(key)}.json"
+    if not f.exists():
+        return None
+    if ttl_hours > 0:
+        mtime = datetime.fromtimestamp(f.stat().st_mtime, tz=timezone.utc)
+        if datetime.now(timezone.utc) - mtime > timedelta(hours=ttl_hours):
+            return None
+    try:
+        return json.loads(f.read_text(encoding="utf-8"))
+    except Exception:
+        return None
 
-WB_BASE = "https://api.worldbank.org/v2"
 
-def wb_fetch_indicator(country_iso3: str, indicator: str, per_page: int = 20000) -> list[dict]:
-    url = f"{WB_BASE}/country/{country_iso3}/indicator/{indicator}"
-    params = {"format": "json", "per_page": per_page}
-    r = retry_get(url, params=params)
+def cache_set(cache_dir: pathlib.Path, key: str, value: Any):
+    ensure_dir(cache_dir)
+    (cache_dir / f"{sha1(key)}.json").write_text(json.dumps(value), encoding="utf-8")
+
+
+def wb_fetch_series(api_base: str, indicator: str, country_iso2: str, per_page: int, cache_dir: pathlib.Path, ttl: int):
+    url = f"{api_base}/country/{country_iso2}/indicator/{indicator}?format=json&per_page={per_page}"
+    cached = cache_get(cache_dir, url, ttl)
+    if cached is not None:
+        return cached
+    r = requests.get(url, timeout=30)
+    r.raise_for_status()
     data = r.json()
-    # World Bank returns [meta, rows]
-    if not isinstance(data, list) or len(data) < 2:
-        return []
-    rows = data[1] or []
+    cache_set(cache_dir, url, data)
+    return data
+
+
+def wb_fetch_indicator_meta(api_base: str, indicator: str, cache_dir: pathlib.Path, ttl: int):
+    url = f"{api_base}/indicator/{indicator}?format=json&per_page=20000"
+    cached = cache_get(cache_dir, url, ttl)
+    if cached is not None:
+        return cached
+    r = requests.get(url, timeout=30)
+    r.raise_for_status()
+    data = r.json()
+    cache_set(cache_dir, url, data)
+    return data
+
+
+def fao_fetch_fbs(api_base: str, country_iso3: str, elements: List[str], cache_dir: pathlib.Path, ttl: int):
+    # Simple pull of entire FBS dataset by country, then filter elements locally to reduce request complexity
+    url = f"{api_base}?area_code={country_iso3}&per_page=50000"
+    cached = cache_get(cache_dir, url, ttl)
+    if cached is None:
+        r = requests.get(url, timeout=60)
+        r.raise_for_status()
+        cached = r.json()
+        cache_set(cache_dir, url, cached)
+    # Response format: { data: [ ... rows ... ], ... }
+    rows = cached.get("data", [])
+    if elements:
+        rows = [r for r in rows if r.get("element") in elements]
     return rows
 
-def wb_save_csv(out_dir: pathlib.Path, code: str, cat: str, rows: list[dict]) -> pathlib.Path:
-    ensure_dir(out_dir)
-    out = out_dir / f"{code}.csv"
-    with out.open("w", newline="", encoding="utf-8") as f:
-        w = csv.writer(f)
-        w.writerow([
-            "countryiso3code", "date", "value",
-            "indicator", "indicatorCode", "category", "last_updated_utc"
-        ])
-        now = utc_now()
-        for r in rows:
-            w.writerow([
-                r.get("countryiso3code"),
-                r.get("date"),
-                r.get("value"),
-                (r.get("indicator") or {}).get("value"),
-                (r.get("indicator") or {}).get("id"),
-                cat,
-                now
-            ])
-    return out
 
-def harvest_world_bank(cfg: dict) -> dict:
-    wb = (cfg.get("world_bank") or {})
-    country = wb.get("country", "BZ")
-    indicators = wb.get("indicators") or []
-    out_dir = pathlib.Path((cfg.get("paths") or {}).get("world_bank_dir", "data/world_bank"))
-    ensure_dir(out_dir)
+def write_manifest(path: pathlib.Path, manifest: Dict[str, Any]):
+    path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
-    results = []
-    for i, meta in enumerate(indicators, start=1):
-        code = meta.get("code")
-        cat = meta.get("category", "Uncategorized")
-        if not code:
-            print(f"[WB] Skipping indicator without code: {meta}")
-            continue
-        print(f"[{i}/{len(indicators)}] WB {code} ({cat}) …")
+
+def now_iso():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def build_world_bank(cfg: Dict[str, Any], out_dir: pathlib.Path, cache_dir: pathlib.Path) -> Dict[str, Any]:
+    wb = cfg["world_bank"]
+    if not wb.get("enabled", True):
+        return {}
+
+    indicators: Dict[str, Dict[str, Any]] = wb["indicators"]
+    countries: List[str] = cfg["project"]["countries"]
+    per_page = wb.get("per_page", 20000)
+    api_base = wb["api_base"]
+    ttl = int(cfg["project"].get("cache_ttl_hours", 24))
+
+    out = out_dir / "world_bank"
+    ensure_dir(out)
+
+    dictionary_rows: List[Dict[str, Any]] = []
+    manifest_entries: List[Dict[str, Any]] = []
+
+    for code, meta in indicators.items():
+        # fetch indicator metadata (WB dict)
+        md = wb_fetch_indicator_meta(api_base, code, cache_dir, ttl)
+        title = meta.get("name", "")
+        unit = meta.get("unit", "")
+        group = meta.get("group", "")
+        # WB meta name if available
         try:
-            rows = wb_fetch_indicator(country, code)
-            if rows:
-                p = wb_save_csv(out_dir, code, cat, rows)
-                results.append({"code": code, "category": cat, "path": str(p)})
-            else:
-                print("  -> no data")
-        except Exception as e:
-            print(f"  -> error: {e}")
-        time.sleep(0.25)  # be polite
+            wb_name = md[1][0].get("name")
+            wb_source_note = md[1][0].get("sourceNote")
+        except Exception:
+            wb_name, wb_source_note = None, None
+
+        # record dictionary entry
+        dictionary_rows.append({
+            "indicator_code": code,
+            "name": title or wb_name or "",
+            "unit": unit,
+            "group": group,
+            "wb_name": wb_name or "",
+            "wb_source_note": (wb_source_note or "").replace("\n", " ").strip()
+        })
+
+        for c in countries:
+            data = wb_fetch_series(api_base, code, c, per_page, cache_dir, ttl)
+            if not isinstance(data, list) or len(data) < 2:
+                continue
+            rows = data[1] or []
+            if not rows:
+                continue
+
+            # tidy: year,value,country,iso2,indicator
+            tidy = []
+            for r in rows:
+                tidy.append({
+                    "country": r.get("country", {}).get("value"),
+                    "iso2c": r.get("countryiso3code", "")[:2] if r.get("countryiso3code") else c,
+                    "year": r.get("date"),
+                    "indicator": code,
+                    "value": r.get("value"),
+                    "unit": unit or "",
+                })
+
+            df = pd.DataFrame(tidy)
+            country_folder = out / c
+            ensure_dir(country_folder)
+            dest = country_folder / f"{code}.csv"
+            df.sort_values(by=["year"], ascending=True).to_csv(dest, index=False)
+
+            manifest_entries.append({
+                "path": str(dest.as_posix()),
+                "indicator": code,
+                "country": c,
+                "rows": int(df.shape[0]),
+                "updated_at": now_iso()
+            })
+
+    # write dictionary and manifest
+    dict_path = out / "_dictionary.csv"
+    pd.DataFrame(dictionary_rows).to_csv(dict_path, index=False)
+
     manifest = {
         "source": "World Bank Open Data",
-        "country": country,
-        "generated_utc": utc_now(),
-        "items": results
+        "generated_at": now_iso(),
+        "items": manifest_entries
     }
-    (out_dir / "_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    print(f"[WB] Wrote manifest at {out_dir / '_manifest.json'}")
-    return manifest
+    write_manifest(out / "_manifest.json", manifest)
 
-# ----------------------- FAOSTAT (Food Balance Sheets) ------------------------
+    # dataset card (create once)
+    card = out / "_dataset_card.md"
+    if not card.exists():
+        card.write_text(
+            "# World Bank Indicators (Caribbean)\n\n"
+            "This folder contains per-country CSVs for indicators defined in catalog.yml.\n\n"
+            "## Columns\n- country\n- iso2c\n- year\n- indicator (code)\n- value\n- unit\n\n"
+            "## Notes\n- Source: World Bank Open Data API\n- See `_dictionary.csv` for indicator details.\n",
+            encoding="utf-8"
+        )
+    return {"world_bank": manifest}
 
-FAO_BASE = "https://fenixservices.fao.org/faostat/api/v1/en"
 
-def fao_fetch_domain_all(domain_path: str, page_size: int = 500000) -> list[dict]:
-    """
-    Pull a large page in one go. If the endpoint supports paging metadata, you could
-    add a loop; most FBS endpoints return all rows with big page_size.
-    """
-    url = f"{FAO_BASE}/{domain_path}"
-    params = {"page_size": page_size}
-    r = retry_get(url, params=params, timeout=90)
-    j = r.json()
-    # API often returns {"data":[...], "totalRecords":..., ...}
-    data = j.get("data") if isinstance(j, dict) else None
-    if isinstance(data, list):
-        return data
-    # Some older endpoints return top-level list
-    if isinstance(j, list):
-        return j
-    return []
+def build_faostat_fbs(cfg: Dict[str, Any], out_dir: pathlib.Path, cache_dir: pathlib.Path) -> Dict[str, Any]:
+    fwo = cfg["faostat_fbs"]
+    if not fwo.get("enabled", True):
+        return {}
 
-def _guess_area_column(sample: dict) -> str | None:
-    candidates = [k for k in sample.keys() if normalize_str(k) in
-                  ("area", "areaitem", "areaname", "area_name", "area code", "area_code", "area_code_m49")]
-    if candidates:
-        return candidates[0]
-    # Fall back: search fields that look like area name
-    for k in sample.keys():
-        if "area" in normalize_str(k):
-            return k
-    return None
+    api_base = fwo["api_base"]
+    countries_iso3: List[str] = fwo["countries_iso3"]
+    elements = fwo.get("elements", [])
+    ttl = int(cfg["project"].get("cache_ttl_hours", 24))
 
-def harvest_fao_fbs(cfg: dict) -> dict:
-    fao = (cfg.get("faostat") or {})
-    fbs = (fao.get("food_balance_sheets") or {})
-    domains: list[str] = fbs.get("domains") or []
-    area_filter = fbs.get("area_filter", "Belize")
-    out_dir = pathlib.Path((cfg.get("paths") or {}).get("faostat_fbs_dir", "data/faostat_fbs"))
-    ensure_dir(out_dir)
+    out = out_dir / fwo.get("out_folder", "faostat_fbs")
+    ensure_dir(out)
 
-    results = []
-    for dom in domains:
-        print(f"[FAO FBS] Domain {dom} …")
-        try:
-            data = fao_fetch_domain_all(dom)
-            if not data:
-                print("  -> empty")
-                continue
-            first = data[0]
-            area_col = _guess_area_column(first)
-            if not area_col:
-                # Try common ones explicitly
-                for k in ("Area", "areaname", "area", "Area Code (M49)"):
-                    if k in first:
-                        area_col = k
-                        break
-            if not area_col:
-                print("  -> could not find an Area column; writing full domain without filter")
-                filtered = data
-            else:
-                filtered = [row for row in data if normalize_str(row.get(area_col)) == normalize_str(area_filter)
-                            or normalize_str(row.get(area_col)) == "84"  # Belize M49 code
-                           ]
-                if not filtered:
-                    print("  -> no Belize rows; writing full domain for debugging")
-                    filtered = data
+    manifest_entries: List[Dict[str, Any]] = []
 
-            # Write CSV
-            out = out_dir / f"{dom.replace('/', '_')}.csv"
-            # Collect all keys to make stable header
-            keys: set[str] = set()
-            for r in filtered:
-                keys.update(r.keys())
-            header = sorted(keys)
-            with out.open("w", newline="", encoding="utf-8") as f:
-                w = csv.DictWriter(f, fieldnames=header, extrasaction="ignore")
-                w.writeheader()
-                for r in filtered:
-                    w.writerow(r)
-            print(f"  -> wrote {out}")
-            results.append({"domain": dom, "path": str(out)})
-        except Exception as e:
-            print(f"  -> error: {e}")
-        time.sleep(0.5)
+    for iso3 in countries_iso3:
+        rows = fao_fetch_fbs(api_base, iso3, elements, cache_dir, ttl)
+        if not rows:
+            continue
+        df = pd.DataFrame(rows)
+        # normalize common fields
+        keep = [c for c in df.columns if c in ("area_code", "area", "item_code", "item", "element", "year", "value", "unit")]
+        if keep:
+            df = df[keep]
+        dest = out / f"{iso3}_fbs.csv"
+        df.sort_values(by=["item", "element", "year"], ascending=True).to_csv(dest, index=False)
+        manifest_entries.append({
+            "path": str(dest.as_posix()),
+            "country_iso3": iso3,
+            "rows": int(df.shape[0]),
+            "updated_at": now_iso()
+        })
 
     manifest = {
-        "source": "FAOSTAT Food Balance Sheets",
-        "area_filter": area_filter,
-        "generated_utc": utc_now(),
-        "domains": domains,
-        "items": results
+        "source": "FAOSTAT — Food Balance Sheets",
+        "generated_at": now_iso(),
+        "items": manifest_entries
     }
-    (out_dir / "_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    print(f"[FAO FBS] Wrote manifest at {out_dir / '_manifest.json'}")
-    return manifest
+    write_manifest(out / "_manifest.json", manifest)
 
-# --------------------------------- main ---------------------------------------
+    # dataset card (create once)
+    card = out / "_dataset_card.md"
+    if not card.exists():
+        card.write_text(
+            "# FAOSTAT Food Balance Sheets (Caribbean)\n\n"
+            "Per-country food balance sheets with common elements.\n\n"
+            "## Columns (common)\n- area_code, area, item_code, item, element, year, value, unit\n\n"
+            "## Notes\n- Source: FAOSTAT API (FBS).\n",
+            encoding="utf-8"
+        )
+    return {"faostat_fbs": manifest}
+
+
+def write_freshness(out_dir: pathlib.Path, parts: Dict[str, Any]):
+    stamp = {
+        "generated_at": now_iso(),
+        "sources": {k: v.get("generated_at") for k, v in parts.items() if v}
+    }
+    (out_dir / "_freshness.json").write_text(json.dumps(stamp, indent=2), encoding="utf-8")
+
 
 def main():
-    cfg = read_catalog("catalog.yml")
-    # World Bank
-    harvest_world_bank(cfg)
-    # FAOSTAT (FBS)
-    if cfg.get("faostat", {}).get("food_balance_sheets"):
-        harvest_fao_fbs(cfg)
+    cfg = load_config()
+    out_dir = ROOT / cfg["project"]["out_dir"]
+    cache_dir = ROOT / cfg["project"]["cache_dir"]
+    ensure_dir(out_dir)
+    ensure_dir(cache_dir)
+
+    parts = {}
+    parts.update(build_world_bank(cfg, out_dir, cache_dir))
+    parts.update(build_faostat_fbs(cfg, out_dir, cache_dir))
+
+    write_freshness(out_dir, parts)
+
+    print("Build complete ✅")
+
 
 if __name__ == "__main__":
     main()
