@@ -82,7 +82,7 @@ jobs:
           git push
 
   release:
-    needs: [build]
+    needs: build
     if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/od-')
     runs-on: ubuntu-latest
     steps:
@@ -90,7 +90,7 @@ jobs:
         with:
           name: data-package
           path: data-package
-      - name: Package ZIP and extract key assets + checksums + index
+      - name: Package ZIP + small assets + checksums
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF#refs/tags/}"
@@ -104,19 +104,7 @@ jobs:
           cp data-package/data/_quality_report.csv        dist/quality_report.csv        || true
           cp data-package/data/_quality_report.json       dist/quality_report.json       || true
           (cd dist && sha256sum *.csv *.json *.zip 2>/dev/null | tee SHA256SUMS.txt || true)
-          python -c "import json,hashlib,os,glob; items=[]; 
-from pathlib import Path
-for p in sorted(glob.glob('dist/*')):
-  if os.path.isfile(p):
-    h=hashlib.sha256()
-    with open(p,'rb') as f:
-      while True:
-        b=f.read(1<<20)
-        if not b: break
-        h.update(b)
-    items.append({'name': os.path.basename(p),'size_bytes': os.path.getsize(p),'sha256': h.hexdigest()})
-Path('dist/ASSET_INDEX.json').write_text(json.dumps({'tag': os.environ.get('GITHUB_REF','').split('/')[-1],'assets': items}, indent=2))"
-      - name: Create/Update GitHub Release (ZIP + small assets)
+      - name: Create/Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
@@ -128,10 +116,9 @@ Path('dist/ASSET_INDEX.json').write_text(json.dumps({'tag': os.environ.get('GITH
             dist/quality_report.csv
             dist/quality_report.json
             dist/SHA256SUMS.txt
-            dist/ASSET_INDEX.json
           body: |
             CaribData Open Data — automated build.
             Assets:
             - open-data-caribbean_<tag>.zip (all data)
             - Separate small files for programmatic linking
-            - SHA256SUMS.txt and ASSET_INDEX.json
+            - SHA256SUMS.txt
