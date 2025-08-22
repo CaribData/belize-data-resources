@@ -1,33 +1,71 @@
-name: Data Build & Release — Belize
+name: Build and Data Release: Caribbean
+
 on:
   workflow_dispatch:
-    inputs:
-      tag:
-        description: "Release tag (e.g., belize-data-2025-08-21 [optional -#1/-#2 etc] )"
-        required: true
-      name:
-        description: "Release name/title"
-        required: true
-permissions:
-  contents: write
+  schedule:
+    - cron: "0 6 * * 1"  # Mondays 06:00 UTC
+  push:
+    paths:
+      - "scripts/**"
+      - "catalog.yml"
+      - ".github/workflows/build-release.yml"
+      - "requirements.txt"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: pip install requests pandas pyyaml
-      - run: python scripts/build_wb_fao.py
-      - name: Create versioned Release (ZIP + manifest + checksums + dictionary)
+          python-version: "3.11"
+
+      - name: Install deps (pinned by requirements.txt)
+        run: pip install -r requirements.txt
+
+      - name: Build datasets
+        run: python scripts/build_wb_fwo.py
+
+      - name: Freshness stamp preview
+        run: cat data/_freshness.json || true
+
+      - name: Data quality report
+        run: python scripts/generate_quality_report.py
+
+      - name: Validate CSVs (frictionless) - non-fatal
+        continue-on-error: true
+        run: |
+          frictionless validate data --type package || true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-package
+          path: |
+            data/
+            catalog.yml
+
+  # Optional release on tags (keep your current tagging strategy)
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: data-package
+          path: data-package
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ inputs.tag }}
-          name: ${{ inputs.name }}
-          make_latest: true
           files: |
-            belize-wb-fao-pack.zip
-            data/_meta/manifest.json
-            data/_meta/checksums.json
-            data/_meta/data_dictionary.md
+            data-package/**/*
+          body: |
+            Automated data build. Includes:
+            - World Bank per-country CSVs + _dictionary.csv + _manifest.json
+            - FAOSTAT FBS CSVs + _manifest.json
+            - Freshness stamp + quality report
