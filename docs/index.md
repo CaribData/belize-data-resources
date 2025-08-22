@@ -1,4 +1,4 @@
-# Belize & Neighbours — Data Resources
+# CaribData Open Data — Caribbean 
 
 Automated pull of World Bank indicators and FAOSTAT FBS for BZ, JM, TT, GY.
 
