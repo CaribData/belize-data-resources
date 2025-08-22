@@ -6,6 +6,7 @@ on:
     paths:
       - "docs/**"
       - "mkdocs.yml"
+      - "requirements.txt"
   workflow_dispatch:
   workflow_run:
     workflows: ["CaribData Open Data — Build & Release"]
@@ -36,37 +37,6 @@ jobs:
           echo "----- mkdocs.yml -----"
           cat mkdocs.yml
           echo "----------------------"
-
-      # Optional: pull latest data freshness from last successful build artifact
-      - name: Download latest data-package artifact
-        uses: dawidd6/action-download-artifact@v3
-        with:
-          workflow: build-release.yml
-          workflow_conclusion: success
-          name: data-package
-          path: data-package
-          if_no_artifact_found: ignore
-
-      - name: Inject freshness into docs (if available)
-        run: |
-          set -e
-          FRESH_PATH="data-package/data/_freshness.json"
-          if [ -f "$FRESH_PATH" ]; then
-            python - <<'PY'
-import json, re, pathlib
-root = pathlib.Path(".")
-fresh = json.loads((root/"data-package"/"data"/"_freshness.json").read_text())
-stamp = fresh.get("generated_at","")
-p = root/"docs"/"index.md"
-txt = p.read_text()
-block = f"<!--FRESHNESS-->Last updated: {stamp} UTC<!--/FRESHNESS-->"
-txt = re.sub(r"<!--FRESHNESS-->.*?<!--/FRESHNESS-->", block, txt, flags=re.S)
-p.write_text(txt)
-print(block)
-PY
-          else
-            echo "No freshness file found; skipping injection."
-          fi
 
       - name: Build site
         run: mkdocs build --strict
