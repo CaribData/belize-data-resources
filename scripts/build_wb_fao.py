@@ -1,256 +1,234 @@
 #!/usr/bin/env python3
-import os, io, time, json, zipfile, hashlib, datetime
-from pathlib import Path
+# -*- coding: utf-8 -*-
+"""
+build_wb_fwo.py
+Belize data harvester for World Bank + FAOSTAT (Food Balance Sheets).
+
+- Reads ./catalog.yml
+- Writes CSVs + a small JSON manifest per source
+- Friendly for non-coders (all knobs live in catalog.yml)
+
+Requirements: PyYAML (yaml), requests
+"""
+from __future__ import annotations
+import csv
+import json
+import os
+import pathlib
+import time
+import typing as t
+from datetime import datetime
 
 import requests
-import pandas as pd
 import yaml
 
-ROOT = Path(__file__).resolve().parents[1]
-CATALOG = ROOT / "catalog.yaml"
-DATA = ROOT / "data"
-META = DATA / "_meta"
-DATA.mkdir(parents=True, exist_ok=True); META.mkdir(parents=True, exist_ok=True)
+# ----------------------------- helpers ---------------------------------------
 
-def sha256_of(path: Path) -> str:
-    h = hashlib.sha256()
-    with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(1<<20), b""): h.update(chunk)
-    return h.hexdigest()
+def utc_now() -> str:
+    return datetime.utcnow().isoformat(timespec="seconds") + "Z"
 
-def linecount_csv(path: Path) -> int:
-    with open(path, "rb") as f:
-        return max(0, sum(1 for _ in f) - 1)
+def ensure_dir(p: pathlib.Path) -> None:
+    p.mkdir(parents=True, exist_ok=True)
 
-def backoff(i): time.sleep(2**i)
-
-# ---------------- World Bank ----------------
-def wb_fetch(country_iso3: str, indicators: dict):
-    base = "https://api.worldbank.org/v2/country/{cc}/indicator/{code}"
-    prov, wb_names = [], {}  # wb_names: code -> human name
-    for code, relpath in indicators.items():
-        url = base.format(cc=country_iso3, code=code)
-        params = {"format":"json","per_page":20000}
-        try:
-            r = requests.get(url, params=params, timeout=90); r.raise_for_status()
-            js = r.json()
-            rows = js[1] if isinstance(js, list) and len(js)>1 else []
-            if not rows:
-                print(f"[WB][WARN] {code}: empty"); continue
-            df = pd.DataFrame(rows)
-            # try to extract readable indicator name from first row
-            try:
-                ind_name = df["indicator"].iloc[0]["value"]
-            except Exception:
-                ind_name = code
-            wb_names[code] = ind_name
-            out = DATA / relpath; out.parent.mkdir(parents=True, exist_ok=True)
-            df_out = df[["indicator","country","date","value"]].copy()
-            df_out["indicator_code"] = code
-            df_out.to_csv(out, index=False)
-            prov.append({"source":"WorldBank WDI","indicator":code,"indicator_name":ind_name,"url":r.url,"path":str(out)})
-            print(f"[WB] {code} -> {out}")
-        except Exception as e:
-            print(f"[WB][WARN] {code}: {e}")
-    return prov, wb_names
-
-# ---------------- FAOSTAT ----------------
-def save_bytes(url, outfile, params=None, tries=3, timeout=120):
-    outfile = Path(outfile); outfile.parent.mkdir(parents=True, exist_ok=True)
+def retry_get(url: str, params: dict | None = None, tries: int = 4, backoff_s: float = 0.8, timeout: int = 60):
     last = None
-    for i in range(tries):
+    for attempt in range(1, tries + 1):
         try:
-            r = requests.get(url, params=params, timeout=timeout, stream=True)
+            r = requests.get(url, params=params, timeout=timeout)
             r.raise_for_status()
-            with open(outfile, "wb") as f:
-                for chunk in r.iter_content(8192):
-                    if chunk: f.write(chunk)
-            return True
+            return r
         except Exception as e:
-            last = e; backoff(i)
-    print(f"[GET][ERROR] {url}: {last}")
-    return False
+            last = e
+            if attempt == tries:
+                raise
+            time.sleep(backoff_s * attempt)
+    raise last  # pragma: no cover
 
-def fao_fetch(downloads: list):
-    """Try FAOSTAT CSV → JSON; fallback to HDX mirror (CSV) if FAO is down."""
-    prov, fao_files = [], []  # fao_files: list of {"domain","path"}
-    for item in downloads:
-        domain = item["domain"]            # Food_Security or Prices
-        out = DATA / item["outfile"]
-        # 1) CSV endpoint (fast but flaky)
-        csv_url = f"https://fenixservices.fao.org/faostat/api/v1/en/{domain}/data"
-        if save_bytes(csv_url, out, params={"area_code":"084","downloadFormat":"csv"}):
-            prov.append({"source":"FAOSTAT","domain":domain,"url":csv_url,"path":str(out)})
-            fao_files.append({"domain":domain, "path": str(out)})
-            print(f"[FAO] {domain} CSV -> {out}"); continue
-        # 2) JSON endpoint → CSV
-        try:
-            json_url = f"https://fenixservices.fao.org/faostat/api/v1/en/{domain}"
-            js = requests.get(json_url, params={"area_code":"084","page_size":50000}, timeout=120).json()
-            data = js.get("data", [])
-            if data:
-                pd.DataFrame(data).to_csv(out, index=False)
-                prov.append({"source":"FAOSTAT","domain":domain,"url":json_url,"path":str(out)})
-                fao_files.append({"domain":domain, "path": str(out)})
-                print(f"[FAO] {domain} JSON -> {out}"); continue
-        except Exception as e:
-            print(f"[FAO][WARN] {domain} JSON: {e}")
-        # 3) HDX mirror fallback (CSV)
-        try:
-            search = requests.get(
-                "https://data.humdata.org/api/3/action/package_search",
-                params={"q": f"FAOSTAT {domain} Belize CSV", "rows": 5}, timeout=120
-            ).json()["result"]["results"]
-            got = False
-            for pkg in search:
-                for rsrc in pkg.get("resources", []):
-                    if (rsrc.get("format","") or "").lower()=="csv" and rsrc.get("url"):
-                        if save_bytes(rsrc["url"], out):
-                            prov.append({"source":"HDX (FAOSTAT mirror)","title":pkg.get("title"),
-                                         "url":rsrc["url"],"path":str(out)})
-                            fao_files.append({"domain":domain, "path": str(out)})
-                            print(f"[FAO][HDX] {domain} -> {out}")
-                            got = True; break
-                if got: break
-            if not got: print(f"[FAO][ERROR] No HDX CSV found for {domain}.")
-        except Exception as e:
-            print(f"[FAO][WARN] HDX search: {e}")
-    return prov, fao_files
+def read_catalog(path: str = "catalog.yml") -> dict:
+    with open(path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
 
+def normalize_str(x) -> str:
+    return str(x).strip().lower() if x is not None else ""
 
-# ---------------- Fetch examples of messy ----------------
-def fetch_messy(items):
-    prov = []
-    for it in items or []:
-        out = (ROOT / "data" / it["outfile"]); out.parent.mkdir(parents=True, exist_ok=True)
-        try:
-            r = requests.get(it["url"], timeout=180, stream=True); r.raise_for_status()
-            with open(out, "wb") as f:
-                for ch in r.iter_content(8192):
-                    if ch: f.write(ch)
-            prov.append({"source":"MessyURL","url":it["url"],"path":str(out),
-                         "license":it.get("license"),"notes":it.get("notes")})
-            print(f"[MESSY] {it['url']} -> {out}")
-        except Exception as e:
-            print(f"[MESSY][WARN] {it['url']}: {e}")
-    return prov
+# ----------------------- World Bank harvesting --------------------------------
 
-# ---------------- Metadata & Packaging ----------------
-def write_checks_and_manifest(prov, catalog_text: str):
-    files = []
-    for p in DATA.rglob("*.csv"):
-        files.append({
-            "path": str(p.relative_to(ROOT)),
-            "rows": linecount_csv(p),
-            "bytes": p.stat().st_size,
-            "sha256": sha256_of(p)
-        })
-    manifest = {
-        "built_at_utc": datetime.datetime.utcnow().isoformat(timespec="seconds") + "Z",
-        "builder_commit": os.getenv("GITHUB_SHA"),
-        "repository": os.getenv("GITHUB_REPOSITORY"),
-        "catalog_sha256": hashlib.sha256(catalog_text.encode("utf-8")).hexdigest(),
-        "sources": prov,
-        "files": files
-    }
-    (META/"checksums.json").write_text(
-        json.dumps({f["path"]: f["sha256"] for f in files}, indent=2), encoding="utf-8")
-    (META/"manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    print(f"[META] wrote checksums.json & manifest.json")
+WB_BASE = "https://api.worldbank.org/v2"
 
-def write_data_dictionary(wb_names: dict, fao_files: list):
-    """Create data/_meta/data_dictionary.md (WB indicators + FAO file summaries)."""
-    lines = []
-    lines.append("# Belize Data Pack — Data Dictionary\n")
-    lines.append("This document is auto-generated at build time.\n")
+def wb_fetch_indicator(country_iso3: str, indicator: str, per_page: int = 20000) -> list[dict]:
+    url = f"{WB_BASE}/country/{country_iso3}/indicator/{indicator}"
+    params = {"format": "json", "per_page": per_page}
+    r = retry_get(url, params=params)
+    data = r.json()
+    # World Bank returns [meta, rows]
+    if not isinstance(data, list) or len(data) < 2:
+        return []
+    rows = data[1] or []
+    return rows
 
-    # World Bank section
-    if wb_names:
-        lines.append("## World Bank indicators\n")
-        lines.append("| Code | Indicator name | CSV path | Reference |\n|---|---|---|---|\n")
-        for code, name in sorted(wb_names.items()):
-            path = _guess_wb_path_for(code)
-            link = f"https://data.worldbank.org/indicator/{code}"
-            lines.append(f"| `{code}` | {name} | `{path}` | {link} |\n")
-        lines.append("\n**Common columns:** `indicator` (object in source; name string in CSV), `country`, `date` (year), `value`, `indicator_code`.\n")
-
-    # FAOSTAT section
-    if fao_files:
-        lines.append("## FAOSTAT files\n")
-        for item in fao_files:
-            p = Path(item["path"])
-            lines.append(f"### {item['domain']} — `{p.relative_to(ROOT)}`\n")
-            # Try to inspect columns and sample units
-            try:
-                df = pd.read_csv(p, nrows=200)
-                cols = ", ".join(df.columns[:20]) + ("…" if len(df.columns) > 20 else "")
-                # Pick a likely unit column
-                unit_cols = [c for c in df.columns if c.lower() in ("unit","units")]
-                unit_note = ""
-                if unit_cols:
-                    samples = df[unit_cols[0]].dropna().astype(str).unique()[:5]
-                    unit_note = f"  \n**Units (sample):** {', '.join(samples)}"
-                lines.append(f"**Columns (first 20):** {cols}{unit_note}\n")
-            except Exception as e:
-                lines.append(f"_Could not inspect columns (read error: {e})._\n")
-        lines.append("\n**Note:** FAOSTAT schemas vary by domain. Expect fields like `Year`, `Area`, `Item`, `Element`, `Value`, `Unit`.\n")
-
-    out = META / "data_dictionary.md"
-    out.write_text("\n".join(lines), encoding="utf-8")
-    print(f"[META] data dictionary -> {out}")
+def wb_save_csv(out_dir: pathlib.Path, code: str, cat: str, rows: list[dict]) -> pathlib.Path:
+    ensure_dir(out_dir)
+    out = out_dir / f"{code}.csv"
+    with out.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow([
+            "countryiso3code", "date", "value",
+            "indicator", "indicatorCode", "category", "last_updated_utc"
+        ])
+        now = utc_now()
+        for r in rows:
+            w.writerow([
+                r.get("countryiso3code"),
+                r.get("date"),
+                r.get("value"),
+                (r.get("indicator") or {}).get("value"),
+                (r.get("indicator") or {}).get("id"),
+                cat,
+                now
+            ])
     return out
 
-def _guess_wb_path_for(code: str) -> str:
-    # map known codes to the relative CSV paths used in catalog.yaml
-    mapping = {
-        "NY.GDP.MKTP.CD":"data/economy/gdp_current_usd.csv",
-        "NY.GDP.PCAP.CD":"data/economy/gdp_per_capita_current_usd.csv",
-        "FP.CPI.TOTL.ZG":"data/economy/inflation_annual_pct.csv",
-        "NE.EXP.GNFS.ZS":"data/economy/exports_pct_gdp.csv",
-        "NE.IMP.GNFS.ZS":"data/economy/imports_pct_gdp.csv",
-        "SP.POP.TOTL":"data/social/population_total.csv",
-        "SP.DYN.LE00.IN":"data/health/life_expectancy_total_years.csv",
-        "SH.XPD.CHEX.GD.ZS":"data/health/health_expenditure_pct_gdp.csv",
-        "SE.SEC.ENRR":"data/education/secondary_enrolment_gross_pct.csv",
-        "IT.NET.USER.ZS":"data/social/internet_users_pct.csv",
-        "SI.POV.DDAY":"data/poverty/extreme_poverty_2_15_usd_ppp_pct.csv",
-        "SG.GEN.PARL.ZS":"data/gender/women_in_parliament_pct.csv",
-        "ST.INT.ARVL":"data/tourism/international_tourist_arrivals.csv",
-    }
-    return mapping.get(code, f"data/<unknown_path_for_{code}>.csv")
+def harvest_world_bank(cfg: dict) -> dict:
+    wb = (cfg.get("world_bank") or {})
+    country = wb.get("country", "BZ")
+    indicators = wb.get("indicators") or []
+    out_dir = pathlib.Path((cfg.get("paths") or {}).get("world_bank_dir", "data/world_bank"))
+    ensure_dir(out_dir)
 
-def zip_output(zipname="belize-wb-fao-pack.zip"):
-    zpath = ROOT / zipname
-    with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
-        for p in (ROOT/"data").rglob("*"):
-            if p.is_file(): z.write(p, p.relative_to(ROOT))
-        z.write(ROOT/"catalog.yaml", "catalog.yaml")
-        z.write(ROOT/"data/_meta/manifest.json", "_meta/manifest.json")
-        z.write(ROOT/"data/_meta/checksums.json", "_meta/checksums.json")
-        z.write(ROOT/"data/_meta/data_dictionary.md", "_meta/data_dictionary.md")
-    print(f"[ZIP] {zpath}")
-    return str(zpath)
+    results = []
+    for i, meta in enumerate(indicators, start=1):
+        code = meta.get("code")
+        cat = meta.get("category", "Uncategorized")
+        if not code:
+            print(f"[WB] Skipping indicator without code: {meta}")
+            continue
+        print(f"[{i}/{len(indicators)}] WB {code} ({cat}) …")
+        try:
+            rows = wb_fetch_indicator(country, code)
+            if rows:
+                p = wb_save_csv(out_dir, code, cat, rows)
+                results.append({"code": code, "category": cat, "path": str(p)})
+            else:
+                print("  -> no data")
+        except Exception as e:
+            print(f"  -> error: {e}")
+        time.sleep(0.25)  # be polite
+    manifest = {
+        "source": "World Bank Open Data",
+        "country": country,
+        "generated_utc": utc_now(),
+        "items": results
+    }
+    (out_dir / "_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    print(f"[WB] Wrote manifest at {out_dir / '_manifest.json'}")
+    return manifest
+
+# ----------------------- FAOSTAT (Food Balance Sheets) ------------------------
+
+FAO_BASE = "https://fenixservices.fao.org/faostat/api/v1/en"
+
+def fao_fetch_domain_all(domain_path: str, page_size: int = 500000) -> list[dict]:
+    """
+    Pull a large page in one go. If the endpoint supports paging metadata, you could
+    add a loop; most FBS endpoints return all rows with big page_size.
+    """
+    url = f"{FAO_BASE}/{domain_path}"
+    params = {"page_size": page_size}
+    r = retry_get(url, params=params, timeout=90)
+    j = r.json()
+    # API often returns {"data":[...], "totalRecords":..., ...}
+    data = j.get("data") if isinstance(j, dict) else None
+    if isinstance(data, list):
+        return data
+    # Some older endpoints return top-level list
+    if isinstance(j, list):
+        return j
+    return []
+
+def _guess_area_column(sample: dict) -> str | None:
+    candidates = [k for k in sample.keys() if normalize_str(k) in
+                  ("area", "areaitem", "areaname", "area_name", "area code", "area_code", "area_code_m49")]
+    if candidates:
+        return candidates[0]
+    # Fall back: search fields that look like area name
+    for k in sample.keys():
+        if "area" in normalize_str(k):
+            return k
+    return None
+
+def harvest_fao_fbs(cfg: dict) -> dict:
+    fao = (cfg.get("faostat") or {})
+    fbs = (fao.get("food_balance_sheets") or {})
+    domains: list[str] = fbs.get("domains") or []
+    area_filter = fbs.get("area_filter", "Belize")
+    out_dir = pathlib.Path((cfg.get("paths") or {}).get("faostat_fbs_dir", "data/faostat_fbs"))
+    ensure_dir(out_dir)
+
+    results = []
+    for dom in domains:
+        print(f"[FAO FBS] Domain {dom} …")
+        try:
+            data = fao_fetch_domain_all(dom)
+            if not data:
+                print("  -> empty")
+                continue
+            first = data[0]
+            area_col = _guess_area_column(first)
+            if not area_col:
+                # Try common ones explicitly
+                for k in ("Area", "areaname", "area", "Area Code (M49)"):
+                    if k in first:
+                        area_col = k
+                        break
+            if not area_col:
+                print("  -> could not find an Area column; writing full domain without filter")
+                filtered = data
+            else:
+                filtered = [row for row in data if normalize_str(row.get(area_col)) == normalize_str(area_filter)
+                            or normalize_str(row.get(area_col)) == "84"  # Belize M49 code
+                           ]
+                if not filtered:
+                    print("  -> no Belize rows; writing full domain for debugging")
+                    filtered = data
+
+            # Write CSV
+            out = out_dir / f"{dom.replace('/', '_')}.csv"
+            # Collect all keys to make stable header
+            keys: set[str] = set()
+            for r in filtered:
+                keys.update(r.keys())
+            header = sorted(keys)
+            with out.open("w", newline="", encoding="utf-8") as f:
+                w = csv.DictWriter(f, fieldnames=header, extrasaction="ignore")
+                w.writeheader()
+                for r in filtered:
+                    w.writerow(r)
+            print(f"  -> wrote {out}")
+            results.append({"domain": dom, "path": str(out)})
+        except Exception as e:
+            print(f"  -> error: {e}")
+        time.sleep(0.5)
+
+    manifest = {
+        "source": "FAOSTAT Food Balance Sheets",
+        "area_filter": area_filter,
+        "generated_utc": utc_now(),
+        "domains": domains,
+        "items": results
+    }
+    (out_dir / "_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    print(f"[FAO FBS] Wrote manifest at {out_dir / '_manifest.json'}")
+    return manifest
+
+# --------------------------------- main ---------------------------------------
 
 def main():
-    catalog_text = (ROOT/"catalog.yaml").read_text(encoding="utf-8")
-    cfg = yaml.safe_load(catalog_text)
-    prov = []
-
-    print("== World Bank ==")
-    wb_prov, wb_names = wb_fetch(cfg["country"], cfg["world_bank"]["indicators"]); prov += wb_prov
-
-    print("== FAOSTAT ==")
-    fao_prov, fao_files = fao_fetch(cfg["fao"]["downloads"]); prov += fao_prov
-
-    print("== MESSY URLs ==")
-    prov += fetch_messy(cfg.get("messy_urls", []))
-
-    # metadata outputs
-    write_checks_and_manifest(prov, catalog_text)
-    write_data_dictionary(wb_names, fao_files)
-
-    z = zip_output()
-    print("DONE:", z)
+    cfg = read_catalog("catalog.yml")
+    # World Bank
+    harvest_world_bank(cfg)
+    # FAOSTAT (FBS)
+    if cfg.get("faostat", {}).get("food_balance_sheets"):
+        harvest_fao_fbs(cfg)
 
 if __name__ == "__main__":
     main()
