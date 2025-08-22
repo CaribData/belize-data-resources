@@ -36,23 +36,13 @@ jobs:
         run: |
           pip install -r requirements.txt
           mkdocs --version
-      - name: Show mkdocs.yml (debug)
-        run: |
-          echo "----- mkdocs.yml -----"
-          cat mkdocs.yml
-          echo "----------------------"
       - name: Build site
         run: mkdocs build --strict
-      - name: List built site (debug)
-        run: |
-          echo "Built files in ./site:"
-          find site -maxdepth 2 -type f | head -n 50
-          echo "Grepping title from homepage:"
-          grep -i "<title>" site/index.html || true
-      - name: Deploy to GitHub Pages (force clean)
+      - name: Deploy to GitHub Pages (preserve existing data/)
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
           publish_branch: gh-pages
-          force_orphan: true
+          keep_files: true     # <-- preserve data/ published by release workflows
+          force_orphan: false
