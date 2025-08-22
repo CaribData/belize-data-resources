@@ -1,0 +1,8 @@
+site_name: Belize & Neighbours — Data Resources
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Datasets: datasets.md
+  - How To: howto.md
+repo_url: https://github.com/CaribData/belize-data-resources
