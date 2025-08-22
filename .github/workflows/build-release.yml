@@ -27,7 +27,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Build datasets
-        run: python scripts/build_wb_fwo.py
+        run: python scripts/build_wb_fao.py
 
       - name: Freshness stamp preview
         run: cat data/_freshness.json || true
