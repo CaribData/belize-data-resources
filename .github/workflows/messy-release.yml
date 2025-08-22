@@ -59,9 +59,9 @@ jobs:
             [ -z "$DATE_FROM_TAG" ] && DATE_FROM_TAG="$(date -u +%F)"
             TITLE="CaribData Messy Data (Belize) — $DATE_FROM_TAG"; PRERELEASE="false"
           fi
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-          echo "title=$TITLE" >> $GITHUB_OUTPUT
-          echo "prerelease=$PRERELEASE" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "title=$TITLE" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
       - name: Create annotated tag (manual runs only)
         if: github.event_name == 'workflow_dispatch'
         env:
@@ -99,7 +99,7 @@ jobs:
           git commit -m "Publish Messy Data for ${TAG} to Pages" || echo "No changes to commit"
           git push
 
-      - name: Package ZIP, extract key assets + checksums + index
+      - name: Package ZIP + small assets + checksums
         run: |
           set -euo pipefail
           TAG="${{ steps.meta.outputs.tag }}"
@@ -110,17 +110,6 @@ jobs:
           cp data/messy/_report.json     dist/messy_report.json     || true
           cp data/messy/_dataset_card.md dist/messy_dataset_card.md || true
           (cd dist && sha256sum *.zip *.json *.md 2>/dev/null | tee SHA256SUMS.txt || true)
-          python -c "import json,hashlib,os,glob; items=[];
-for p in sorted(glob.glob('dist/*')):
-  if os.path.isfile(p):
-    h=hashlib.sha256()
-    with open(p,'rb') as f:
-      while True:
-        b=f.read(1<<20)
-        if not b: break
-        h.update(b)
-    items.append({'name': os.path.basename(p),'size_bytes': os.path.getsize(p),'sha256': h.hexdigest()})
-open('dist/ASSET_INDEX.json','w').write(json.dumps({'tag': '${{ steps.meta.outputs.tag }}','assets': items}, indent=2))"
       - name: Create/Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -133,10 +122,9 @@ open('dist/ASSET_INDEX.json','w').write(json.dumps({'tag': '${{ steps.meta.outpu
             dist/messy_report.json
             dist/messy_dataset_card.md
             dist/SHA256SUMS.txt
-            dist/ASSET_INDEX.json
           body: |
             CaribData Messy Data (Belize) — automated bundle.
             Assets:
             - belize-messy-bundle_<tag>.zip (all raw files)
             - Separate files for programmatic linking: manifest, report, dataset card
-            - SHA256SUMS.txt and ASSET_INDEX.json
+            - SHA256SUMS.txt
