@@ -3,7 +3,7 @@
 Lightweight data quality report:
 - Scans data/ for CSVs
 - Checks: row count, missing values %, duplicate rows
-- Emits data/_quality_report.json and a friendly CSV summary
+- Emits data/_quality_report.json and data/_quality_report.csv
 """
 import json
 import pathlib
@@ -25,7 +25,7 @@ def analyze(path: pathlib.Path):
     dups = int(df.duplicated().sum())
     na_pct = float(df.isna().sum().sum()) / float(df.shape[0]*max(1,df.shape[1])) * 100.0
     return {
-        "path": str(path),
+        "path": str(path.relative_to(ROOT)),
         "rows": rows,
         "columns": list(df.columns),
         "duplicate_rows": dups,
