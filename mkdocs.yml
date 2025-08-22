@@ -1,8 +1,10 @@
-site_name: Belize & Neighbours — Data Resources
+### `mkdocs.yml`
+```yaml
+site_name: CaribData Open Data — Caribbean
 theme:
   name: material
 nav:
   - Home: index.md
   - Datasets: datasets.md
   - How To: howto.md
-repo_url: https://github.com/CaribData/belize-data-resources
+repo_url: https://github.com/CaribData/open-data-caribbean
