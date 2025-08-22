@@ -66,14 +66,21 @@ jobs:
         with:
           name: data-package
           path: pkg
-      - name: Stage per-tag dataset under gh-pages/data/<TAG>/
+      - name: Stage per-tag dataset under gh-pages/data/<TAG>/ (with debug)
         run: |
           set -euo pipefail
+          echo "DEBUG: listing artifact contents"
+          find pkg -maxdepth 2 -type d -print
+          find pkg -type f | head -n 40
+          echo "DEBUG: counting CSVs"
+          find pkg/data -type f -name "*.csv" | wc -l || true
           mkdir -p "ghp/data/${TAG}"
           rsync -a --delete "pkg/data/" "ghp/data/${TAG}/"
           ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           printf '{\n  "tag": "%s",\n  "published_at": "%s"\n}\n' "$TAG" "$ts" > "ghp/data/${TAG}/_index.json"
           printf '{\n  "tag": "%s",\n  "published_at": "%s"\n}\n' "$TAG" "$ts" > "ghp/data/latest.json"
+          echo "DEBUG: staged files:"
+          find "ghp/data/${TAG}" -type f | head -n 60
           cd ghp
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -90,21 +97,45 @@ jobs:
         with:
           name: data-package
           path: data-package
+
+      - name: Verify artifact (debug)
+        run: |
+          set -euo pipefail
+          echo "DEBUG: artifact tree (first 120 files)"
+          find data-package -type f | head -n 120
+          echo "DEBUG: counts"
+          echo "files:" $(find data-package -type f | wc -l)
+          echo "csvs :" $(find data-package -type f -name "*.csv" | wc -l)
+
+      - name: Assemble distributable (only data/ + catalog.yml)
+        run: |
+          set -euo pipefail
+          rm -rf stage dist
+          mkdir -p stage dist
+          rsync -a data-package/data/ stage/data/
+          cp -f data-package/catalog.yml stage/catalog.yml
+          echo "DEBUG: stage contents"
+          find stage -type f | head -n 120
+          echo "files:" $(find stage -type f | wc -l)
+
       - name: Package ZIP + small assets + checksums
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF#refs/tags/}"
-          mkdir -p dist
           ZIP="open-data-caribbean_${TAG}.zip"
-          (cd data-package && zip -r "../dist/${ZIP}" data catalog.yml >/dev/null)
-          cp data-package/data/world_bank/_dictionary.csv dist/world_bank_dictionary.csv || true
-          cp data-package/data/world_bank/_manifest.json  dist/world_bank_manifest.json  || true
-          cp data-package/data/faostat_fbs/_manifest.json dist/faostat_manifest.json     || true
-          cp data-package/data/_freshness.json            dist/freshness.json            || true
-          cp data-package/data/_quality_report.csv        dist/quality_report.csv        || true
-          cp data-package/data/_quality_report.json       dist/quality_report.json       || true
+          (cd stage && zip -r "../dist/${ZIP}" . >/dev/null)
+          # Small assets for pipelines
+          cp stage/data/world_bank/_dictionary.csv dist/world_bank_dictionary.csv || true
+          cp stage/data/world_bank/_manifest.json  dist/world_bank_manifest.json  || true
+          cp stage/data/faostat_fbs/_manifest.json dist/faostat_manifest.json     || true
+          cp stage/data/_freshness.json            dist/freshness.json            || true
+          cp stage/data/_quality_report.csv        dist/quality_report.csv        || true
+          cp stage/data/_quality_report.json       dist/quality_report.json       || true
           (cd dist && sha256sum *.csv *.json *.zip 2>/dev/null | tee SHA256SUMS.txt || true)
-      - name: Create/Update GitHub Release
+          echo "DEBUG: dist listing"
+          ls -lah dist
+
+      - name: Create/Update GitHub Release (attach data assets)
         uses: softprops/action-gh-release@v2
         with:
           files: |
@@ -117,8 +148,5 @@ jobs:
             dist/quality_report.json
             dist/SHA256SUMS.txt
           body: |
-            CaribData Open Data — automated build.
-            Assets:
-            - open-data-caribbean_<tag>.zip (all data)
-            - Separate small files for programmatic linking
-            - SHA256SUMS.txt
+            CaribData Open Data — automated build (data-only assets).
+            NOTE: Ignore the auto-added “Source code” zips — they contain repository files, not data.
