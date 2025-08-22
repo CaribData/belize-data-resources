@@ -7,22 +7,67 @@ on:
       - "docs/**"
       - "mkdocs.yml"
   workflow_dispatch:
+  # Auto-build docs whenever the data build finishes successfully
+  workflow_run:
+    workflows: ["CaribData Open Data — Build & Release"]
+    types: [completed]
+  # Nightly refresh (optional)
+  schedule:
+    - cron: "30 5 * * *"   # 05:30 UTC daily
 
 permissions:
-  contents: write   # needed to push the gh-pages branch
+  contents: write    # push to gh-pages
+  actions: read      # read artifacts from other workflows
 
 jobs:
   build-deploy:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install MkDocs
+
+      - name: Install MkDocs + deps
         run: pip install -r requirements.txt
+
+      # Download latest data artifact from the Build & Release workflow (if available)
+      - name: Download latest data-package artifact
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: build-release.yml
+          workflow_conclusion: success
+          name: data-package
+          path: data-package
+          if_no_artifact_found: ignore
+
+      # Inject freshness timestamp into docs (if artifact present)
+      - name: Inject freshness into docs
+        run: |
+          set -e
+          FRESH_PATH="data-package/data/_freshness.json"
+          if [ -f "$FRESH_PATH" ]; then
+            python - <<'PY'
+import json, re, pathlib
+root = pathlib.Path(".")
+fresh = json.loads((root / "data-package" / "data" / "_freshness.json").read_text())
+stamp = fresh.get("generated_at","")
+p = root / "docs" / "index.md"
+txt = p.read_text()
+block = f"<!--FRESHNESS-->Last updated: {stamp} UTC<!--/FRESHNESS-->"
+txt = re.sub(r"<!--FRESHNESS-->.*?<!--/FRESHNESS-->", block, txt, flags=re.S)
+p.write_text(txt)
+print(block)
+PY
+          else
+            echo "No freshness file found; skipping injection."
+          fi
+
       - name: Build site
         run: mkdocs build --strict
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
