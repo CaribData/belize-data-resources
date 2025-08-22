@@ -3,7 +3,7 @@ name: CaribData Messy Data — Release
 on:
   push:
     tags:
-      - "md-*"     # e.g., md-v2025.08.22 or md-v2025-08-22
+      - "md-*"
   workflow_dispatch:
     inputs:
       tag:
@@ -34,42 +34,30 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - name: Install deps
         run: pip install -r requirements.txt
-
       - name: Build messy bundle
         env:
           CARIBDATA_HTTP_TIMEOUT: "120"
           CARIBDATA_HTTP_RETRIES: "6"
           CARIBDATA_HTTP_BACKOFF: "0.8"
         run: python scripts/fetch_messy.py
-
       - name: Compute tag/title/prerelease
         id: meta
         shell: bash
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TAG="${{ inputs.tag }}"
-            if [ -z "$TAG" ]; then
-              TAG="md-v$(date -u +%Y.%m.%d)"
-            fi
-            TITLE="${{ inputs.title }}"
-            if [ -z "$TITLE" ]; then
-              TITLE="CaribData Messy Data (Belize) — $(date -u +%F)"
-            fi
+            TAG="${{ inputs.tag }}"; [ -z "$TAG" ] && TAG="md-v$(date -u +%Y.%m.%d)"
+            TITLE="${{ inputs.title }}"; [ -z "$TITLE" ] && TITLE="CaribData Messy Data (Belize) — $(date -u +%F)"
             PRERELEASE="${{ inputs.prerelease && 'true' || 'false' }}"
           else
-            REF="${GITHUB_REF#refs/tags/}"
-            TAG="$REF"
+            REF="${GITHUB_REF#refs/tags/}"; TAG="$REF"
             DATE_FROM_TAG=$(echo "$REF" | sed -nE 's/md-v([0-9]{4})[-.]([0-9]{2})[-.]([0-9]{2}).*/\1-\2-\3/p')
-            if [ -z "$DATE_FROM_TAG" ]; then DATE_FROM_TAG="$(date -u +%F)"; fi
-            TITLE="CaribData Messy Data (Belize) — $DATE_FROM_TAG"
-            PRERELEASE="false"
+            [ -z "$DATE_FROM_TAG" ] && DATE_FROM_TAG="$(date -u +%F)"
+            TITLE="CaribData Messy Data (Belize) — $DATE_FROM_TAG"; PRERELEASE="false"
           fi
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "title=$TITLE" >> $GITHUB_OUTPUT
@@ -89,6 +77,61 @@ jobs:
             git push origin "$TAG"
           fi
 
+      # Publish to Pages under /data/messy/<TAG>/
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: ghp
+          fetch-depth: 0
+      - name: Stage messy files to Pages
+        env:
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          set -euo pipefail
+          mkdir -p "ghp/data/messy/${TAG}"
+          rsync -a "data/messy/" "ghp/data/messy/${TAG}/"
+          python - <<'PY'
+import json, os, datetime, pathlib
+tag = os.environ["TAG"]
+ts  = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+root = pathlib.Path("ghp") / "data" / "messy"
+(root / tag / "_index.json").write_text(json.dumps({"tag": tag, "published_at": ts}, indent=2))
+PY
+          cd ghp
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git commit -m "Publish Messy Data for ${TAG} to Pages" || echo "No changes to commit"
+          git push
+
+      # Release: single ZIP + small assets + checksums + index
+      - name: Package ZIP, extract key assets + checksums + index
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.meta.outputs.tag }}"
+          mkdir -p dist
+          DEST="dist/belize-messy-bundle_${TAG}.zip"
+          cp data/messy/belize-messy-bundle.zip "$DEST"
+          cp data/messy/_manifest.json   dist/messy_manifest.json   || true
+          cp data/messy/_report.json     dist/messy_report.json     || true
+          cp data/messy/_dataset_card.md dist/messy_dataset_card.md || true
+          (cd dist && shasum -a 256 *.zip *.json *.md 2>/dev/null | tee SHA256SUMS.txt || true)
+          python - <<'PY'
+import json, hashlib, os
+items=[]
+for fn in sorted(os.listdir("dist")):
+    p=os.path.join("dist", fn)
+    if os.path.isfile(p):
+        h=hashlib.sha256()
+        with open(p,'rb') as f:
+            for chunk in iter(lambda: f.read(1<<20), b''):
+                h.update(chunk)
+        items.append({"name": fn, "size_bytes": os.path.getsize(p), "sha256": h.hexdigest()})
+with open("dist/ASSET_INDEX.json","w") as f:
+    json.dump({"tag": os.environ.get("TAG",""), "assets": items}, f, indent=2)
+print("Indexed", len(items), "assets")
+PY
       - name: Create/Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -96,7 +139,15 @@ jobs:
           name: ${{ steps.meta.outputs.title }}
           prerelease: ${{ steps.meta.outputs.prerelease }}
           files: |
-            data/messy/belize-messy-bundle.zip
-            data/messy/_manifest.json
-            data/messy/_report.json
-            data/messy/_dataset_card.md
+            dist/belize-messy-bundle_*.zip
+            dist/messy_manifest.json
+            dist/messy_report.json
+            dist/messy_dataset_card.md
+            dist/SHA256SUMS.txt
+            dist/ASSET_INDEX.json
+          body: |
+            CaribData Messy Data (Belize) — automated bundle.
+            Assets:
+            - belize-messy-bundle_<tag>.zip (all raw files)
+            - Separate files for programmatic linking: manifest, report, dataset card
+            - SHA256SUMS.txt and ASSET_INDEX.json
