@@ -1,12 +1,13 @@
-# Belize Data Resources (World Bank + FAOSTAT)
+# Belize Data Resources
+## Created by Ian Hambleton (22-Aug-2025)
 
-**Our versioned data pack:**
-1. Go to **Actions → “Build & Release — Belize (WB + FAO, versioned)” → Run workflow**.
-2. Tag: e.g. `wb-fao-2025-08-21` (date) or `v1.0.0` (semantic).
-3. Name: a friendly title (shown on Releases).
+**Belize versioned data pack:**
+1. Go to **Actions → “Build & Release — Belize” → Run workflow**.
+2. Tag: e.g. `belize-data-2025-08-21 [optional -#1/-#2 etc] (date).
+3. Name: e.g. Belize Data Pack - (2025-08-21, v1.0.1) (shown on Releases).
 
 The workflow produces a **Release** containing:
-- `belize-wb-fao-pack.zip` (all CSVs + catalog + provenance)
+- `belize-data-pack.zip` (all datasets + catalog + provenance)
 - `_meta/manifest.json` (build time, commit SHA, catalog hash, file checksums/rows)
 - `_meta/checksums.json` (path → SHA-256)
 
@@ -14,5 +15,5 @@ The workflow produces a **Release** containing:
 - **New data ⇒ new tag.** Don’t overwrite tags.
 - The most recent release is automatically marked **Latest**.
 
-**Add sources later**
-- Edit `catalog.yaml` (add indicators or FAOSTAT domains), then re-run the workflow.
+**MetaData sources**
+- Included in `catalog.yaml`.
