@@ -63,4 +63,28 @@ world_bank:
     # Tourism
     "ST.INT.ARVL": {name: "International tourism, number of arrivals", unit: "arrivals", group: "Tourism"}
     "ST.INT.RCPT.CD": {name: "International tourism, receipts (current US$)", unit: "US$", group: "Tourism"}
-    "ST.INT.XPND.CD": {name: "International tourism, expenditures (current US$)", unit: "US$", group: "Tourism"
+    "ST.INT.XPND.CD": {name: "International tourism, expenditures (current US$)", unit: "US$", group: "Tourism"}
+
+faostat_fbs:
+  enabled: true
+  # API (first try). Domains can be expanded if needed.
+  api_base: "https://fenixservices.fao.org/faostat/api/v1/en"
+  domains:
+    - "FBS/FBS"
+
+  # Bulk fallback (robust). Mirrors used widely in production.
+  bulk_urls:
+    - "https://bulks-faostat.fao.org/production/FoodBalanceSheets_E_All_Data_(Normalized).zip"
+    - "https://fenixservices.fao.org/faostat/static/bulkdownloads/FoodBalanceSheets_E_All_Data_(Normalized).zip"
+
+  # ISO3 for FAO; script maps to M49 internally
+  countries_iso3: ["BLZ", "JAM", "TTO", "GUY"]
+
+  # Optional element filter (leave empty to fetch all)
+  elements: ["Food supply (kcal/capita/day)", "Food supply quantity (kg/capita/yr)"]
+
+  out_folder: "faostat_fbs"
+
+local:
+  enabled: false
+  sources: []
