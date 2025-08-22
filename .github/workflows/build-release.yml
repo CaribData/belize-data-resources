@@ -55,7 +55,6 @@ jobs:
     env:
       TAG: ${{ github.ref_name }}
     steps:
-      # Pull gh-pages into ./ghp
       - name: Checkout gh-pages
         uses: actions/checkout@v4
         with:
@@ -72,15 +71,9 @@ jobs:
           set -euo pipefail
           mkdir -p "ghp/data/${TAG}"
           rsync -a --delete "pkg/data/" "ghp/data/${TAG}/"
-          # Write latest.json pointing to this TAG
-          python - <<'PY'
-import json, os, datetime, pathlib
-tag = os.environ["TAG"]
-ts  = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-root = pathlib.Path("ghp") / "data"
-(root / tag / "_index.json").write_text(json.dumps({"tag": tag, "published_at": ts}, indent=2))
-(root / "latest.json").write_text(json.dumps({"tag": tag, "published_at": ts}, indent=2))
-PY
+          ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          printf '{\n  "tag": "%s",\n  "published_at": "%s"\n}\n' "$TAG" "$ts" > "ghp/data/${TAG}/_index.json"
+          printf '{\n  "tag": "%s",\n  "published_at": "%s"\n}\n' "$TAG" "$ts" > "ghp/data/latest.json"
           cd ghp
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -110,22 +103,19 @@ PY
           cp data-package/data/_freshness.json            dist/freshness.json            || true
           cp data-package/data/_quality_report.csv        dist/quality_report.csv        || true
           cp data-package/data/_quality_report.json       dist/quality_report.json       || true
-          (cd dist && shasum -a 256 *.csv *.json *.zip 2>/dev/null | tee SHA256SUMS.txt || true)
-          python - <<'PY'
-import json, hashlib, os
-items=[]
-for fn in sorted(os.listdir("dist")):
-    p=os.path.join("dist", fn)
-    if os.path.isfile(p):
-        h=hashlib.sha256()
-        with open(p,'rb') as f:
-            for chunk in iter(lambda: f.read(1<<20), b''):
-                h.update(chunk)
-        items.append({"name": fn, "size_bytes": os.path.getsize(p), "sha256": h.hexdigest()})
-with open("dist/ASSET_INDEX.json","w") as f:
-    json.dump({"tag": os.environ.get("GITHUB_REF","").split("/")[-1], "assets": items}, f, indent=2)
-print("Indexed", len(items), "assets")
-PY
+          (cd dist && sha256sum *.csv *.json *.zip 2>/dev/null | tee SHA256SUMS.txt || true)
+          python -c "import json,hashlib,os,glob; items=[]; 
+from pathlib import Path
+for p in sorted(glob.glob('dist/*')):
+  if os.path.isfile(p):
+    h=hashlib.sha256()
+    with open(p,'rb') as f:
+      while True:
+        b=f.read(1<<20)
+        if not b: break
+        h.update(b)
+    items.append({'name': os.path.basename(p),'size_bytes': os.path.getsize(p),'sha256': h.hexdigest()})
+Path('dist/ASSET_INDEX.json').write_text(json.dumps({'tag': os.environ.get('GITHUB_REF','').split('/')[-1],'assets': items}, indent=2))"
       - name: Create/Update GitHub Release (ZIP + small assets)
         uses: softprops/action-gh-release@v2
         with:
