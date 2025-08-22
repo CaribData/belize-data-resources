@@ -31,3 +31,151 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install MkDocs + deps
+        run: |
+          pip install -r requirements.txt
+          mkdocs --version
+
+      # Pull current gh-pages so we can read /data/... that was published by release workflows
+      - name: Checkout gh-pages (read-only)
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: ghp
+          fetch-depth: 0
+
+      # Generate docs/downloads.md from files actually present on gh-pages
+      - name: Generate Downloads page
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p docs
+          BASE_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
+
+          # Helper to percent-encode common characters in path segments
+          urlencode_path () {
+            local in="$1"
+            in="${in// /%20}"
+            in="${in//(/%28}"
+            in="${in//)/%29}"
+            in="${in//&/%26}"
+            in="${in//#/%23}"
+            echo "$in"
+          }
+
+          # Latest Open Data tag (if any)
+          LATEST_TAG=""
+          if [ -f ghp/data/latest.json ]; then
+            LATEST_TAG="$(grep -oE '"tag"\s*:\s*"[^"]+"' ghp/data/latest.json | sed -E 's/.*"tag"\s*:\s*"([^"]+)".*/\1/')"
+          fi
+
+          {
+            echo "# Downloads"
+            echo
+            if [ -n "$LATEST_TAG" ] && [ -d "ghp/data/$LATEST_TAG" ]; then
+              echo "## Open Data — Latest: \`$LATEST_TAG\`"
+              echo ""
+              echo "**Quick links**"
+              for p in "_freshness.json" "_quality_report.csv" "_quality_report.json"; do
+                if [ -f "ghp/data/$LATEST_TAG/$p" ]; then
+                  rel="data/$LATEST_TAG/$p"
+                  echo "- [$p](${BASE_URL}/$(urlencode_path "$rel"))"
+                fi
+              done
+              for p in "world_bank/_dictionary.csv" "world_bank/_manifest.json" "faostat_fbs/_manifest.json"; do
+                if [ -f "ghp/data/$LATEST_TAG/$p" ]; then
+                  rel="data/$LATEST_TAG/$p"
+                  echo "- [$p](${BASE_URL}/$(urlencode_path "$rel"))"
+                fi
+              done
+              echo
+              # World Bank per-country CSVs
+              if [ -d "ghp/data/$LATEST_TAG/world_bank" ]; then
+                echo "### World Bank CSVs"
+                for country in $(find "ghp/data/$LATEST_TAG/world_bank" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort); do
+                  echo "- **$country**"
+                  while IFS= read -r f; do
+                    bn="$(basename "$f")"
+                    rel="${f#ghp/}"     # strip leading ghp/
+                    echo "  - [$bn](${BASE_URL}/$(urlencode_path "$rel"))"
+                  done < <(find "ghp/data/$LATEST_TAG/world_bank/$country" -type f -name "*.csv" | sort)
+                done
+                echo
+              fi
+              # FAOSTAT FBS CSVs
+              if [ -d "ghp/data/$LATEST_TAG/faostat_fbs" ]; then
+                echo "### FAOSTAT FBS CSVs"
+                while IFS= read -r f; do
+                  bn="$(basename "$f")"
+                  rel="${f#ghp/}"
+                  echo "- [$bn](${BASE_URL}/$(urlencode_path "$rel"))"
+                done < <(find "ghp/data/$LATEST_TAG/faostat_fbs" -type f -name "*_fbs.csv" | sort)
+                echo
+              fi
+            else
+              echo "## Open Data — (no published tag found yet)"
+              echo
+            fi
+
+            # Messy Data latest (pick the lexicographically last tag dir)
+            echo "## Messy Data (Belize)"
+            if [ -d "ghp/data/messy" ] && ls -1 "ghp/data/messy" >/dev/null 2>&1; then
+              MTAG="$(ls -1 ghp/data/messy | sort -V | tail -n 1)"
+              echo "_Latest messy tag:_ \`$MTAG\`"
+              echo
+              for p in "_manifest.json" "_report.json" "_dataset_card.md"; do
+                if [ -f "ghp/data/messy/$MTAG/$p" ]; then
+                  rel="data/messy/$MTAG/$p"
+                  echo "- [$p](${BASE_URL}/$(urlencode_path "$rel"))"
+                fi
+              done
+              echo
+              echo "### Raw files"
+              if [ -d "ghp/data/messy/$MTAG/raw" ]; then
+                # List per slug
+                for slug in $(find "ghp/data/messy/$MTAG/raw" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort); do
+                  echo "- **$slug**"
+                  while IFS= read -r f; do
+                    bn="$(basename "$f")"
+                    rel="${f#ghp/}"
+                    echo "  - [$bn](${BASE_URL}/$(urlencode_path "$rel"))"
+                  done < <(find "ghp/data/messy/$MTAG/raw/$slug" -type f \( -iname "*.xlsx" -o -iname "*.xls" -o -iname "*.csv" \) | sort)
+                done
+                echo
+              fi
+            else
+              echo "_No messy data published yet._"
+              echo
+            fi
+
+            # All available Open Data tags (for pinning)
+            if [ -d "ghp/data" ]; then
+              echo "## All Open Data tags"
+              TAGS="$(find ghp/data -mindepth 1 -maxdepth 1 -type d -printf "%f\n" \
+                     | grep -E '^(v|od-)' | sort -V)"
+              if [ -n "$TAGS" ]; then
+                while IFS= read -r t; do
+                  echo "- [$t](${BASE_URL}/data/$(urlencode_path "$t")/)"
+                done <<< "$TAGS"
+                echo
+              fi
+            fi
+          } > docs/downloads.md
+
+          echo "Generated docs/downloads.md:"
+          head -n 60 docs/downloads.md || true
+
+      - name: Build site
+        run: mkdocs build --strict
+
+      - name: Deploy to GitHub Pages (preserve existing data/)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          publish_branch: gh-pages
+          keep_files: true
+          force_orphan: false
