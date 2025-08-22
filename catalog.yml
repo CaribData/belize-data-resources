@@ -1,6 +1,6 @@
 project:
   name: CaribData Open Data Repository
-  countries: ["BZ", "JM", "TT", "GY"]   # ISO-2 for World Bank
+  countries: ["BZ", "JM", "TT", "GY"]
   out_dir: "data"
   cache_dir: ".cache"
   cache_ttl_hours: 24
@@ -67,23 +67,62 @@ world_bank:
 
 faostat_fbs:
   enabled: true
-  # API (first try). Domains can be expanded if needed.
   api_base: "https://fenixservices.fao.org/faostat/api/v1/en"
-  domains:
-    - "FBS/FBS"
-
-  # Bulk fallback (robust). Mirrors used widely in production.
+  domains: ["FBS/FBS"]
   bulk_urls:
     - "https://bulks-faostat.fao.org/production/FoodBalanceSheets_E_All_Data_(Normalized).zip"
     - "https://fenixservices.fao.org/faostat/static/bulkdownloads/FoodBalanceSheets_E_All_Data_(Normalized).zip"
-
-  # ISO3 for FAO; script maps to M49 internally
   countries_iso3: ["BLZ", "JAM", "TTO", "GUY"]
-
-  # Optional element filter (leave empty to fetch all)
   elements: ["Food supply (kcal/capita/day)", "Food supply quantity (kg/capita/yr)"]
-
   out_folder: "faostat_fbs"
+
+# Messy Belize datasets (now includes tourism)
+messy:
+  enabled: true
+  items:
+    - slug: sib_health_death_causes_2021
+      name: SIB – Leading Causes of Death, 2021
+      source: Statistical Institute of Belize
+      url: "https://sib.org.bz/statistics/other-statistics/health-statistics/"
+      expected_issues: ["merged_cells","header_rows","sheet_notes"]
+      license: "Public domain/official stats (verify page terms)"
+    - slug: sib_secondary_education_2021_22
+      name: SIB – Secondary Education Statistics 2021/22
+      source: Statistical Institute of Belize
+      url: "https://sib.org.bz/statistics/other-statistics/education-statistics/"
+      expected_issues: ["multi_sheet","header_rows"]
+      license: "Public domain/official stats (verify page terms)"
+    - slug: cbb_monetary_survey
+      name: Central Bank – Monetary Survey (Banking System)
+      source: Central Bank of Belize
+      url: "https://www.centralbank.org.bz/home/statistics/banking-system/monetary-survey"
+      expected_issues: ["footer_totals","stub_rows"]
+      license: "© Central Bank — public stats"
+    - slug: cbb_gdp_by_expenditure_current
+      name: Central Bank – GDP by Expenditure (Current Prices)
+      source: Central Bank of Belize
+      url: "https://www.centralbank.org.bz/home/statistics/national-accounts/gross-domestic-product-by-expenditure---current-prices"
+      expected_issues: ["section_totals","header_rows"]
+      license: "© Central Bank — public stats"
+    - slug: moa_production_stats_2003
+      name: Ministry of Agriculture – Production Stats 2003
+      source: Ministry of Agriculture
+      url: "https://www.agriculture.gov.bz/wp-content/uploads/2020/11/prodstats03Rev.xlsx"
+      expected_issues: ["old_format","region_columns"]
+      license: "© Ministry of Agriculture — public stats"
+    # NEW Tourism:
+    - slug: sib_tourism_statistics
+      name: SIB – Tourism Statistics (xlsx)
+      source: Statistical Institute of Belize
+      url: "https://sib.org.bz/wp-content/uploads/TourismStatistics.xlsx"
+      expected_issues: ["notes_in_sheet","multi_table","header_rows"]
+      license: "Public domain/official stats (verify page terms)"
+    - slug: cbb_key_tourism_indicators
+      name: Central Bank – Key Tourism Indicators (xlsx via page)
+      source: Central Bank of Belize
+      url: "https://www.centralbank.org.bz/home/statistics/general-statistics/key-tourism-indicators-%282001-2024%29"
+      expected_issues: ["stub_rows","footnotes","section_totals"]
+      license: "© Central Bank — public stats"
 
 local:
   enabled: false
