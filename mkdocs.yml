@@ -4,5 +4,6 @@ theme:
 nav:
   - Home: index.md
   - Datasets: datasets.md
+  - Messy Data: messy.md
   - How To: howto.md
 repo_url: https://github.com/CaribData/open-data-caribbean
