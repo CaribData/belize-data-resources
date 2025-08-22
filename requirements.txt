@@ -1,0 +1,7 @@
+requests>=2.31
+PyYAML>=6.0
+pandas>=2.2
+frictionless>=5.16
+mkdocs>=1.6
+mkdocs-material>=9.5
+markdown>=3.6
