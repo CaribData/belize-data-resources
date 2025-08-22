@@ -12,6 +12,7 @@ on:
     workflows:
       - "CaribData Open Data — Build & Release"
       - "CaribData Messy Data — Fetch & Bundle"
+      - "CaribData Messy Data — Release"
     types: [completed]
 
 permissions:
