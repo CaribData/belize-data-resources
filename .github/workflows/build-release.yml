@@ -1,4 +1,4 @@
-name: Build & Release — Belize (WB + FAO, versioned)
+name: Data Build & Release — Belize
 on:
   workflow_dispatch:
     inputs:
