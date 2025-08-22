@@ -1,5 +1,18 @@
-# Belize Data Resources
+# Belize, Guyana, Jamaica, Trinidad & Tobago - Open Data Resources
 ## Created by Ian Hambleton (22-Aug-2025)
+
+![Build](https://github.com/CaribData/belize-data-resources/actions/workflows/build-release.yml/badge.svg)
+
+An updatable, versioned data resource for **Belize (BZ)** and neighbours **Jamaica (JM)**, **Trinidad & Tobago (TT)**, **Guyana (GY)** pulling:
+- World Bank indicators (curated in `catalog.yml`)
+- FAOSTAT Food Balance Sheets (FBS)
+
+## Quick start
+```bash
+pip install -r requirements.txt
+python scripts/build_wb_fwo.py
+python scripts/generate_quality_report.py
+```
 
 **Belize versioned data pack:**
 1. Go to **Actions → “Build & Release — Belize” → Run workflow**.
