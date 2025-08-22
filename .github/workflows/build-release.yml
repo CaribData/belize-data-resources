@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag (e.g., wb-fao-2025-08-21 or v1.0.0)"
+        description: "Release tag (e.g., belize-data-2025-08-21 [optional -#1/-#2 etc] )"
         required: true
       name:
         description: "Release name/title"
