@@ -1,5 +1,3 @@
-### `mkdocs.yml`
-```yaml
 site_name: CaribData Open Data — Caribbean
 theme:
   name: material
