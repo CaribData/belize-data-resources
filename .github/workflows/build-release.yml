@@ -48,19 +48,10 @@ jobs:
             sleep $((i*30))
           done
 
-      - name: Freshness stamp preview
-        run: cat data/_freshness.json || true
-
       - name: Data quality report
         run: python scripts/generate_quality_report.py || true
 
-      - name: Validate CSVs (non-fatal)
-        continue-on-error: true
-        run: |
-          frictionless validate data/world_bank/**/*.csv || true
-          frictionless validate data/faostat_fbs/*.csv || true
-
-      - name: Upload artifacts
+      - name: Upload build artifact (for release job)
         uses: actions/upload-artifact@v4
         with:
           name: data-package
@@ -74,20 +65,36 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/od-')
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifacts
+      - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: data-package
           path: data-package
 
-      - name: Create/Update GitHub Release
+      - name: Make distributable zip + checksum
+        id: pack
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF#refs/tags/}"
+          mkdir -p dist
+          # One zip containing ALL generated data
+          ZIP="open-data-caribbean_${TAG}.zip"
+          (cd data-package && zip -r "../dist/${ZIP}" data catalog.yml >/dev/null)
+          shasum -a 256 "dist/${ZIP}" > "dist/${ZIP}.sha256"
+          echo "zip=dist/${ZIP}" >> "$GITHUB_OUTPUT"
+          echo "sha=dist/${ZIP}.sha256" >> "$GITHUB_OUTPUT"
+          echo "Created $(ls -lh dist/${ZIP})"
+
+      - name: Create/Update GitHub Release (attach single zip)
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            data-package/**/*
+            ${{ steps.pack.outputs.zip }}
+            ${{ steps.pack.outputs.sha }}
           body: |
             CaribData Open Data — automated build.
-            Includes:
-            - World Bank per-country CSVs + _dictionary.csv + _manifest.json
-            - FAOSTAT FBS CSVs + _manifest.json
-            - Freshness stamp + quality report
+            Asset:
+            - ${{ steps.pack.outputs.zip }} (SHA256 in .sha256)
+            Contents include:
+            - data/world_bank/*, data/faostat_fbs/*, _dictionary/_manifest/_freshness/_quality_report
