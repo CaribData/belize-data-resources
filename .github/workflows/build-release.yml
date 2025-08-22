@@ -3,12 +3,12 @@ name: CaribData Open Data — Build & Release
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * 1"   # Mondays 06:00 UTC (optional)
+    - cron: "0 6 * * 1"
   push:
-    branches: [ "main" ]  # build on normal pushes (no release)
+    branches: [ "main" ]
     tags:
-      - "v*"              # e.g., v2025.08.22
-      - "od-*"            # e.g., od-v2025-08-22 or od-2025.08.22
+      - "v*"
+      - "od-*"
 
 permissions:
   contents: write
@@ -17,17 +17,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - name: Install deps
         run: pip install -r requirements.txt
-
       - name: Build datasets (retry up to 3x)
         env:
           CARIBDATA_HTTP_TIMEOUT: "90"
@@ -38,20 +33,14 @@ jobs:
           for i in 1 2 3; do
             echo "Attempt $i ..."
             if python scripts/build_wb_fao.py; then
-              echo "Build succeeded on attempt $i"
-              break
+              echo "Build succeeded on attempt $i"; break
             fi
-            if [ "$i" -eq 3 ]; then
-              echo "Build failed after 3 attempts"
-              exit 1
-            fi
+            [ "$i" -eq 3 ] && { echo "Build failed after 3 attempts"; exit 1; }
             sleep $((i*30))
           done
-
       - name: Data quality report
         run: python scripts/generate_quality_report.py || true
-
-      - name: Upload build artifact (for release job)
+      - name: Upload build artifact (for downstream jobs)
         uses: actions/upload-artifact@v4
         with:
           name: data-package
@@ -59,42 +48,100 @@ jobs:
             data/
             catalog.yml
 
-  release:
+  publish-pages-data:
     needs: build
-    # Only when it was a tag push
     if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/od-')
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.ref_name }}
     steps:
-      - name: Download build artifact
+      # Pull gh-pages into ./ghp
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: ghp
+          fetch-depth: 0
+      - name: Download built data
         uses: actions/download-artifact@v4
         with:
           name: data-package
-          path: data-package
+          path: pkg
+      - name: Stage per-tag dataset under gh-pages/data/<TAG>/
+        run: |
+          set -euo pipefail
+          mkdir -p "ghp/data/${TAG}"
+          rsync -a --delete "pkg/data/" "ghp/data/${TAG}/"
+          # Write latest.json pointing to this TAG
+          python - <<'PY'
+import json, os, datetime, pathlib
+tag = os.environ["TAG"]
+ts  = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+root = pathlib.Path("ghp") / "data"
+(root / tag / "_index.json").write_text(json.dumps({"tag": tag, "published_at": ts}, indent=2))
+(root / "latest.json").write_text(json.dumps({"tag": tag, "published_at": ts}, indent=2))
+PY
+          cd ghp
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git commit -m "Publish Open Data for ${TAG} to Pages" || echo "No changes to commit"
+          git push
 
-      - name: Make distributable zip + checksum
-        id: pack
-        shell: bash
+  release:
+    needs: [build]
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/od-')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: data-package
+          path: data-package
+      - name: Package ZIP and extract key assets + checksums + index
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF#refs/tags/}"
           mkdir -p dist
-          # One zip containing ALL generated data
           ZIP="open-data-caribbean_${TAG}.zip"
           (cd data-package && zip -r "../dist/${ZIP}" data catalog.yml >/dev/null)
-          shasum -a 256 "dist/${ZIP}" > "dist/${ZIP}.sha256"
-          echo "zip=dist/${ZIP}" >> "$GITHUB_OUTPUT"
-          echo "sha=dist/${ZIP}.sha256" >> "$GITHUB_OUTPUT"
-          echo "Created $(ls -lh dist/${ZIP})"
-
-      - name: Create/Update GitHub Release (attach single zip)
+          cp data-package/data/world_bank/_dictionary.csv dist/world_bank_dictionary.csv || true
+          cp data-package/data/world_bank/_manifest.json  dist/world_bank_manifest.json  || true
+          cp data-package/data/faostat_fbs/_manifest.json dist/faostat_manifest.json     || true
+          cp data-package/data/_freshness.json            dist/freshness.json            || true
+          cp data-package/data/_quality_report.csv        dist/quality_report.csv        || true
+          cp data-package/data/_quality_report.json       dist/quality_report.json       || true
+          (cd dist && shasum -a 256 *.csv *.json *.zip 2>/dev/null | tee SHA256SUMS.txt || true)
+          python - <<'PY'
+import json, hashlib, os
+items=[]
+for fn in sorted(os.listdir("dist")):
+    p=os.path.join("dist", fn)
+    if os.path.isfile(p):
+        h=hashlib.sha256()
+        with open(p,'rb') as f:
+            for chunk in iter(lambda: f.read(1<<20), b''):
+                h.update(chunk)
+        items.append({"name": fn, "size_bytes": os.path.getsize(p), "sha256": h.hexdigest()})
+with open("dist/ASSET_INDEX.json","w") as f:
+    json.dump({"tag": os.environ.get("GITHUB_REF","").split("/")[-1], "assets": items}, f, indent=2)
+print("Indexed", len(items), "assets")
+PY
+      - name: Create/Update GitHub Release (ZIP + small assets)
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ${{ steps.pack.outputs.zip }}
-            ${{ steps.pack.outputs.sha }}
+            dist/open-data-caribbean_*.zip
+            dist/world_bank_dictionary.csv
+            dist/world_bank_manifest.json
+            dist/faostat_manifest.json
+            dist/freshness.json
+            dist/quality_report.csv
+            dist/quality_report.json
+            dist/SHA256SUMS.txt
+            dist/ASSET_INDEX.json
           body: |
             CaribData Open Data — automated build.
-            Asset:
-            - ${{ steps.pack.outputs.zip }} (SHA256 in .sha256)
-            Contents include:
-            - data/world_bank/*, data/faostat_fbs/*, _dictionary/_manifest/_freshness/_quality_report
+            Assets:
+            - open-data-caribbean_<tag>.zip (all data)
+            - Separate small files for programmatic linking
+            - SHA256SUMS.txt and ASSET_INDEX.json
