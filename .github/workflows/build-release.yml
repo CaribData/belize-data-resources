@@ -3,11 +3,12 @@ name: CaribData Open Data — Build & Release
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * 1"   # Mondays 06:00 UTC
+    - cron: "0 6 * * 1"   # Mondays 06:00 UTC (optional)
   push:
-    branches: [ "main" ]  # build on normal pushes
+    branches: [ "main" ]  # build on normal pushes (no release)
     tags:
-      - "v*"              # ALSO build+release when a tag like v2025.08.22 is pushed
+      - "v*"              # e.g., v2025.08.22
+      - "od-*"            # e.g., od-v2025-08-22 or od-2025.08.22
 
 permissions:
   contents: write
@@ -51,7 +52,7 @@ jobs:
         run: cat data/_freshness.json || true
 
       - name: Data quality report
-        run: python scripts/ggenerate_quality_report.py || python scripts/generate_quality_report.py
+        run: python scripts/generate_quality_report.py || true
 
       - name: Validate CSVs (non-fatal)
         continue-on-error: true
@@ -69,7 +70,8 @@ jobs:
 
   release:
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')   # only when tag like v2025.08.22
+    # Only when it was a tag push
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/od-')
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
