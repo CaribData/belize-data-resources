@@ -4,7 +4,7 @@ Automated pull of World Bank indicators and FAOSTAT FBS for BZ, JM, TT, GY.
 
 - Change countries & indicators in `catalog.yml`
 - Run the build (CI or local)
-- Freshness stamp: <!--FRESHNESS-->Last updated: (pending)<!--/FRESHNESS-->
+- Freshness: <!--FRESHNESS-->Last updated: (pending)<!--/FRESHNESS-->
 
 ## What’s included
 - World Bank per-country CSVs under `data/world_bank/<ISO2>/`
