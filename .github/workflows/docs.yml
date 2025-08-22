@@ -16,6 +16,10 @@ permissions:
   contents: write
   actions: read
 
+concurrency:
+  group: docs-site
+  cancel-in-progress: true
+
 jobs:
   build-deploy:
     if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success')
