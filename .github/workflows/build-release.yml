@@ -1,4 +1,4 @@
-name: Build and Data Release: Caribbean
+name: CaribData Open Data - Build and Release
 
 on:
   workflow_dispatch:
