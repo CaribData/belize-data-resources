@@ -34,14 +34,12 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install MkDocs (no repo deps required)
-        shell: bash
+      - name: Install MkDocs (minimal)
         run: |
           set -eux
           pip install mkdocs mkdocs-material
           mkdocs --version
 
-      # Pull current gh-pages so we can read /data/... that release workflows published
       - name: Checkout gh-pages (read-only)
         uses: actions/checkout@v4
         continue-on-error: true
@@ -50,98 +48,66 @@ jobs:
           path: ghp
           fetch-depth: 0
 
-      - name: Ensure gh-pages workspace exists
-        shell: bash
+      - name: Inspect gh-pages (debug)
         run: |
           set -eux
-          mkdir -p ghp
-          mkdir -p ghp/data
           ls -la ghp || true
           ls -la ghp/data || true
-          [ -f ghp/data/latest.json ] && echo "latest.json:" && cat ghp/data/latest.json || echo "(no latest.json yet)"
+          [ -f ghp/data/latest.json ] && { echo "latest.json:"; cat ghp/data/latest.json; } || echo "(no latest.json)"
+          echo "Tag dirs under ghp/data:"
+          find ghp/data -mindepth 1 -maxdepth 1 -type d -printf "%f\n" 2>/dev/null | sort -V || true
+          echo "Messy tags:"
+          [ -d ghp/data/messy ] && ls -1 ghp/data/messy | sort -V || echo "(no messy/)"
 
-      # Generate docs/downloads.md from files actually present on gh-pages
       - name: Generate Downloads page
-        shell: bash
         run: |
           set -euo pipefail
-          set -x
           mkdir -p docs
-
-          # BASE_URL for HTTPS links
           OWNER="${GITHUB_REPOSITORY_OWNER}"
           REPO="${GITHUB_REPOSITORY#*/}"
           BASE_URL="https://${OWNER}.github.io/${REPO}"
+          urlencode_path () { local in="$1"; in="${in// /%20}"; in="${in//(/%28}"; in="${in//)/%29}"; in="${in//&/%26}"; in="${in//#/%23}"; echo "$in"; }
 
-          urlencode_path () {
-            local in="$1"
-            in="${in// /%20}"; in="${in//(/%28}"; in="${in//)/%29}"
-            in="${in//&/%26}"; in="${in//#/%23}"
-            echo "$in"
-          }
-
-          # Determine latest Open Data tag
           LATEST_TAG=""
           if [ -f ghp/data/latest.json ]; then
             LATEST_TAG="$(grep -oE '"tag"\s*:\s*"[^"]+"' ghp/data/latest.json | sed -E 's/.*"tag"\s*:\s*"([^"]+)".*/\1/' || true)"
           fi
           if [ -z "$LATEST_TAG" ]; then
-            # Fallback: pick highest version-like dir starting with v or od-
-            set +o pipefail
             LATEST_TAG="$(find ghp/data -mindepth 1 -maxdepth 1 -type d -printf "%f\n" 2>/dev/null | grep -E '^(v|od-)' | sort -V | tail -n 1 || true)"
-            set -o pipefail
           fi
 
-          # Determine latest Messy tag
           MESSY_TAG=""
           if [ -d ghp/data/messy ]; then
-            set +o pipefail
             MESSY_TAG="$(ls -1 ghp/data/messy | sort -V | tail -n 1 || true)"
-            set -o pipefail
           fi
 
           {
             echo "# Downloads"
             echo
-
-            # ------- Open Data section -------
             if [ -n "$LATEST_TAG" ] && [ -d "ghp/data/$LATEST_TAG" ]; then
               echo "## Open Data — Latest: \`$LATEST_TAG\`"
               echo
               for p in "_freshness.json" "_quality_report.csv" "_quality_report.json" "world_bank/_dictionary.csv" "world_bank/_manifest.json" "faostat_fbs/_manifest.json"; do
-                if [ -f "ghp/data/$LATEST_TAG/$p" ]; then
-                  rel="data/$LATEST_TAG/$p"
-                  echo "- [$p](${BASE_URL}/$(urlencode_path "$rel"))"
-                fi
+                [ -f "ghp/data/$LATEST_TAG/$p" ] && rel="data/$LATEST_TAG/$p" && echo "- [$p](${BASE_URL}/$(urlencode_path "$rel"))"
               done
               echo
-
-              # World Bank per-country CSVs
               if [ -d "ghp/data/$LATEST_TAG/world_bank" ]; then
                 echo "### World Bank CSVs"
-                set +o pipefail
-                for country in $(find "ghp/data/$LATEST_TAG/world_bank" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" 2>/dev/null | sort); do
+                for country in $(find "ghp/data/$LATEST_TAG/world_bank" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort); do
                   echo "- **$country**"
-                  for f in $(find "ghp/data/$LATEST_TAG/world_bank/$country" -type f -name "*.csv" 2>/dev/null | sort); do
-                    bn="$(basename "$f")"
-                    rel="${f#ghp/}"
+                  for f in $(find "ghp/data/$LATEST_TAG/world_bank/$country" -type f -name "*.csv" | sort); do
+                    bn="$(basename "$f")"; rel="${f#ghp/}"
                     echo "  - [$bn](${BASE_URL}/$(urlencode_path "$rel"))"
                   done
                 done
-                set -o pipefail
                 echo
               fi
-
-              # FAOSTAT FBS CSVs
               if [ -d "ghp/data/$LATEST_TAG/faostat_fbs" ]; then
                 echo "### FAOSTAT FBS CSVs"
-                set +o pipefail
-                for f in $(find "ghp/data/$LATEST_TAG/faostat_fbs" -type f -name "*_fbs.csv" 2>/dev/null | sort); do
-                  bn="$(basename "$f")"
-                  rel="${f#ghp/}"
+                for f in $(find "ghp/data/$LATEST_TAG/faostat_fbs" -type f -name "*_fbs.csv" | sort); do
+                  bn="$(basename "$f")"; rel="${f#ghp/}"
                   echo "- [$bn](${BASE_URL}/$(urlencode_path "$rel"))"
                 done
-                set -o pipefail
                 echo
               fi
             else
@@ -149,30 +115,23 @@ jobs:
               echo
             fi
 
-            # ------- Messy section -------
             echo "## Messy Data (Belize)"
             if [ -n "$MESSY_TAG" ] && [ -d "ghp/data/messy/$MESSY_TAG" ]; then
               echo "_Latest messy tag:_ \`$MESSY_TAG\`"
               echo
               for p in "_manifest.json" "_report.json" "_dataset_card.md"; do
-                if [ -f "ghp/data/messy/$MESSY_TAG/$p" ]; then
-                  rel="data/messy/$MESSY_TAG/$p"
-                  echo "- [$p](${BASE_URL}/$(urlencode_path "$rel"))"
-                fi
+                [ -f "ghp/data/messy/$MESSY_TAG/$p" ] && rel="data/messy/$MESSY_TAG/$p" && echo "- [$p](${BASE_URL}/$(urlencode_path "$rel"))"
               done
               echo
               echo "### Raw files"
               if [ -d "ghp/data/messy/$MESSY_TAG/raw" ]; then
-                set +o pipefail
-                for slug in $(find "ghp/data/messy/$MESSY_TAG/raw" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" 2>/dev/null | sort); do
+                for slug in $(find "ghp/data/messy/$MESSY_TAG/raw" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort); do
                   echo "- **$slug**"
-                  for f in $(find "ghp/data/messy/$MESSY_TAG/raw/$slug" -type f \( -iname "*.xlsx" -o -iname "*.xls" -o -iname "*.csv" \) 2>/dev/null | sort); do
-                    bn="$(basename "$f")"
-                    rel="${f#ghp/}"
+                  for f in $(find "ghp/data/messy/$MESSY_TAG/raw/$slug" -type f \( -iname "*.xlsx" -o -iname "*.xls" -o -iname "*.csv" \) | sort); do
+                    bn="$(basename "$f")"; rel="${f#ghp/}"
                     echo "  - [$bn](${BASE_URL}/$(urlencode_path "$rel"))"
                   done
                 done
-                set -o pipefail
                 echo
               fi
             else
@@ -180,15 +139,12 @@ jobs:
               echo
             fi
 
-            # ------- All Open Data tags -------
             echo "## All Open Data tags"
-            set +o pipefail
             TAGS="$(find ghp/data -mindepth 1 -maxdepth 1 -type d -printf "%f\n" 2>/dev/null | grep -E '^(v|od-)' | sort -V || true)"
-            set -o pipefail
             if [ -n "$TAGS" ]; then
               while IFS= read -r t; do
                 [ -z "$t" ] && continue
-                echo "- [$t](${BASE_URL}/data/$(urlencode_path "$t")/)"
+                echo "- [$t](${BASE_URL}/data/${t}/)"
               done <<< "$TAGS"
               echo
             fi
@@ -198,7 +154,6 @@ jobs:
           head -n 120 docs/downloads.md || true
 
       - name: Build site
-        shell: bash
         run: |
           set -eux
           mkdocs build --strict
