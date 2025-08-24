@@ -1,0 +1,34 @@
+{
+  "source": "FAOSTAT \u2014 Food Balance Sheets",
+  "generated_at": "2025-08-24T17:06:57Z",
+  "items": [
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/faostat_fbs/BLZ_fbs.csv",
+      "country_iso3": "BLZ",
+      "rows": 2672,
+      "updated_at": "2025-08-24T17:06:54Z",
+      "bulk_url": "https://bulks-faostat.fao.org/production/FoodBalanceSheets_E_All_Data_(Normalized).zip"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/faostat_fbs/JAM_fbs.csv",
+      "country_iso3": "JAM",
+      "rows": 2632,
+      "updated_at": "2025-08-24T17:06:55Z",
+      "bulk_url": "https://bulks-faostat.fao.org/production/FoodBalanceSheets_E_All_Data_(Normalized).zip"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/faostat_fbs/TTO_fbs.csv",
+      "country_iso3": "TTO",
+      "rows": 2693,
+      "updated_at": "2025-08-24T17:06:56Z",
+      "bulk_url": "https://bulks-faostat.fao.org/production/FoodBalanceSheets_E_All_Data_(Normalized).zip"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/faostat_fbs/GUY_fbs.csv",
+      "country_iso3": "GUY",
+      "rows": 2647,
+      "updated_at": "2025-08-24T17:06:57Z",
+      "bulk_url": "https://bulks-faostat.fao.org/production/FoodBalanceSheets_E_All_Data_(Normalized).zip"
+    }
+  ]
+}

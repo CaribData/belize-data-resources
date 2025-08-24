@@ -1,0 +1,1154 @@
+{
+  "source": "World Bank Open Data",
+  "generated_at": "2025-08-24T17:05:41Z",
+  "items": [
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/NY.GDP.MKTP.CD.csv",
+      "indicator": "NY.GDP.MKTP.CD",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:43Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/NY.GDP.MKTP.CD.csv",
+      "indicator": "NY.GDP.MKTP.CD",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:43Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/NY.GDP.MKTP.CD.csv",
+      "indicator": "NY.GDP.MKTP.CD",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:44Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/NY.GDP.MKTP.CD.csv",
+      "indicator": "NY.GDP.MKTP.CD",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:44Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/NY.GDP.PCAP.CD.csv",
+      "indicator": "NY.GDP.PCAP.CD",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:44Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/NY.GDP.PCAP.CD.csv",
+      "indicator": "NY.GDP.PCAP.CD",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:45Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/NY.GDP.PCAP.CD.csv",
+      "indicator": "NY.GDP.PCAP.CD",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:45Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/NY.GDP.PCAP.CD.csv",
+      "indicator": "NY.GDP.PCAP.CD",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:45Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/NE.EXP.GNFS.ZS.csv",
+      "indicator": "NE.EXP.GNFS.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:46Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/NE.EXP.GNFS.ZS.csv",
+      "indicator": "NE.EXP.GNFS.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:46Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/NE.EXP.GNFS.ZS.csv",
+      "indicator": "NE.EXP.GNFS.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:46Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/NE.EXP.GNFS.ZS.csv",
+      "indicator": "NE.EXP.GNFS.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:47Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/NE.IMP.GNFS.ZS.csv",
+      "indicator": "NE.IMP.GNFS.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:47Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/NE.IMP.GNFS.ZS.csv",
+      "indicator": "NE.IMP.GNFS.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:48Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/NE.IMP.GNFS.ZS.csv",
+      "indicator": "NE.IMP.GNFS.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:48Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/NE.IMP.GNFS.ZS.csv",
+      "indicator": "NE.IMP.GNFS.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:48Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/GC.XPN.TOTL.GD.ZS.csv",
+      "indicator": "GC.XPN.TOTL.GD.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:49Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/GC.XPN.TOTL.GD.ZS.csv",
+      "indicator": "GC.XPN.TOTL.GD.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:49Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/GC.XPN.TOTL.GD.ZS.csv",
+      "indicator": "GC.XPN.TOTL.GD.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:49Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/GC.XPN.TOTL.GD.ZS.csv",
+      "indicator": "GC.XPN.TOTL.GD.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:50Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/BN.CAB.XOKA.GD.ZS.csv",
+      "indicator": "BN.CAB.XOKA.GD.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:51Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/BN.CAB.XOKA.GD.ZS.csv",
+      "indicator": "BN.CAB.XOKA.GD.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:51Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/BN.CAB.XOKA.GD.ZS.csv",
+      "indicator": "BN.CAB.XOKA.GD.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:51Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/BN.CAB.XOKA.GD.ZS.csv",
+      "indicator": "BN.CAB.XOKA.GD.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:52Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/FP.CPI.TOTL.ZG.csv",
+      "indicator": "FP.CPI.TOTL.ZG",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:52Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/FP.CPI.TOTL.ZG.csv",
+      "indicator": "FP.CPI.TOTL.ZG",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:52Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/FP.CPI.TOTL.ZG.csv",
+      "indicator": "FP.CPI.TOTL.ZG",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:53Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/FP.CPI.TOTL.ZG.csv",
+      "indicator": "FP.CPI.TOTL.ZG",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:53Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/NE.GDI.TOTL.ZS.csv",
+      "indicator": "NE.GDI.TOTL.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:54Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/NE.GDI.TOTL.ZS.csv",
+      "indicator": "NE.GDI.TOTL.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:54Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/NE.GDI.TOTL.ZS.csv",
+      "indicator": "NE.GDI.TOTL.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:54Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/NE.GDI.TOTL.ZS.csv",
+      "indicator": "NE.GDI.TOTL.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:55Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/GC.TAX.TOTL.GD.ZS.csv",
+      "indicator": "GC.TAX.TOTL.GD.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:55Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/GC.TAX.TOTL.GD.ZS.csv",
+      "indicator": "GC.TAX.TOTL.GD.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:55Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/GC.TAX.TOTL.GD.ZS.csv",
+      "indicator": "GC.TAX.TOTL.GD.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:56Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/GC.TAX.TOTL.GD.ZS.csv",
+      "indicator": "GC.TAX.TOTL.GD.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:56Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/NE.TRD.GNFS.ZS.csv",
+      "indicator": "NE.TRD.GNFS.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:57Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/NE.TRD.GNFS.ZS.csv",
+      "indicator": "NE.TRD.GNFS.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:57Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/NE.TRD.GNFS.ZS.csv",
+      "indicator": "NE.TRD.GNFS.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:57Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/NE.TRD.GNFS.ZS.csv",
+      "indicator": "NE.TRD.GNFS.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:57Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/NV.AGR.TOTL.ZS.csv",
+      "indicator": "NV.AGR.TOTL.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:58Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/NV.AGR.TOTL.ZS.csv",
+      "indicator": "NV.AGR.TOTL.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:58Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/NV.AGR.TOTL.ZS.csv",
+      "indicator": "NV.AGR.TOTL.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:59Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/NV.AGR.TOTL.ZS.csv",
+      "indicator": "NV.AGR.TOTL.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:59Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/NV.IND.TOTL.ZS.csv",
+      "indicator": "NV.IND.TOTL.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:59Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/NV.IND.TOTL.ZS.csv",
+      "indicator": "NV.IND.TOTL.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:04:59Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/NV.IND.TOTL.ZS.csv",
+      "indicator": "NV.IND.TOTL.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:00Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/NV.IND.TOTL.ZS.csv",
+      "indicator": "NV.IND.TOTL.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:00Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SL.UEM.TOTL.ZS.csv",
+      "indicator": "SL.UEM.TOTL.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:02Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SL.UEM.TOTL.ZS.csv",
+      "indicator": "SL.UEM.TOTL.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:02Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SL.UEM.TOTL.ZS.csv",
+      "indicator": "SL.UEM.TOTL.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:03Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SL.UEM.TOTL.ZS.csv",
+      "indicator": "SL.UEM.TOTL.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:03Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SL.UEM.1524.ZS.csv",
+      "indicator": "SL.UEM.1524.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:04Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SL.UEM.1524.ZS.csv",
+      "indicator": "SL.UEM.1524.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:04Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SL.UEM.1524.ZS.csv",
+      "indicator": "SL.UEM.1524.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:04Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SL.UEM.1524.ZS.csv",
+      "indicator": "SL.UEM.1524.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:04Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SL.EMP.TOTL.SP.ZS.csv",
+      "indicator": "SL.EMP.TOTL.SP.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:05Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SL.EMP.TOTL.SP.ZS.csv",
+      "indicator": "SL.EMP.TOTL.SP.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:05Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SL.EMP.TOTL.SP.ZS.csv",
+      "indicator": "SL.EMP.TOTL.SP.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:05Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SL.EMP.TOTL.SP.ZS.csv",
+      "indicator": "SL.EMP.TOTL.SP.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:06Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SL.TLF.TOTL.IN.csv",
+      "indicator": "SL.TLF.TOTL.IN",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:06Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SL.TLF.TOTL.IN.csv",
+      "indicator": "SL.TLF.TOTL.IN",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:07Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SL.TLF.TOTL.IN.csv",
+      "indicator": "SL.TLF.TOTL.IN",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:07Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SL.TLF.TOTL.IN.csv",
+      "indicator": "SL.TLF.TOTL.IN",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:07Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SP.POP.TOTL.csv",
+      "indicator": "SP.POP.TOTL",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:08Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SP.POP.TOTL.csv",
+      "indicator": "SP.POP.TOTL",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:08Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SP.POP.TOTL.csv",
+      "indicator": "SP.POP.TOTL",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:08Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SP.POP.TOTL.csv",
+      "indicator": "SP.POP.TOTL",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:08Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SP.URB.TOTL.IN.ZS.csv",
+      "indicator": "SP.URB.TOTL.IN.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:09Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SP.URB.TOTL.IN.ZS.csv",
+      "indicator": "SP.URB.TOTL.IN.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:09Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SP.URB.TOTL.IN.ZS.csv",
+      "indicator": "SP.URB.TOTL.IN.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:10Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SP.URB.TOTL.IN.ZS.csv",
+      "indicator": "SP.URB.TOTL.IN.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:10Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/EG.ELC.ACCS.ZS.csv",
+      "indicator": "EG.ELC.ACCS.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:11Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/EG.ELC.ACCS.ZS.csv",
+      "indicator": "EG.ELC.ACCS.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:11Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/EG.ELC.ACCS.ZS.csv",
+      "indicator": "EG.ELC.ACCS.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:11Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/EG.ELC.ACCS.ZS.csv",
+      "indicator": "EG.ELC.ACCS.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:11Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/IT.NET.USER.ZS.csv",
+      "indicator": "IT.NET.USER.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:12Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/IT.NET.USER.ZS.csv",
+      "indicator": "IT.NET.USER.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:12Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/IT.NET.USER.ZS.csv",
+      "indicator": "IT.NET.USER.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:12Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/IT.NET.USER.ZS.csv",
+      "indicator": "IT.NET.USER.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:13Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SP.DYN.LE00.IN.csv",
+      "indicator": "SP.DYN.LE00.IN",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:13Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SP.DYN.LE00.IN.csv",
+      "indicator": "SP.DYN.LE00.IN",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:13Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SP.DYN.LE00.IN.csv",
+      "indicator": "SP.DYN.LE00.IN",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:14Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SP.DYN.LE00.IN.csv",
+      "indicator": "SP.DYN.LE00.IN",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:14Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SH.XPD.CHEX.GD.ZS.csv",
+      "indicator": "SH.XPD.CHEX.GD.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:15Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SH.XPD.CHEX.GD.ZS.csv",
+      "indicator": "SH.XPD.CHEX.GD.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:15Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SH.XPD.CHEX.GD.ZS.csv",
+      "indicator": "SH.XPD.CHEX.GD.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:15Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SH.XPD.CHEX.GD.ZS.csv",
+      "indicator": "SH.XPD.CHEX.GD.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:16Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SH.XPD.CHEX.PC.CD.csv",
+      "indicator": "SH.XPD.CHEX.PC.CD",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:16Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SH.XPD.CHEX.PC.CD.csv",
+      "indicator": "SH.XPD.CHEX.PC.CD",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:16Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SH.XPD.CHEX.PC.CD.csv",
+      "indicator": "SH.XPD.CHEX.PC.CD",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:17Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SH.XPD.CHEX.PC.CD.csv",
+      "indicator": "SH.XPD.CHEX.PC.CD",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:17Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SP.DYN.TFRT.IN.csv",
+      "indicator": "SP.DYN.TFRT.IN",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:18Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SP.DYN.TFRT.IN.csv",
+      "indicator": "SP.DYN.TFRT.IN",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:18Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SP.DYN.TFRT.IN.csv",
+      "indicator": "SP.DYN.TFRT.IN",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:18Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SP.DYN.TFRT.IN.csv",
+      "indicator": "SP.DYN.TFRT.IN",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:18Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SH.MED.BEDS.ZS.csv",
+      "indicator": "SH.MED.BEDS.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:19Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SH.MED.BEDS.ZS.csv",
+      "indicator": "SH.MED.BEDS.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:19Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SH.MED.BEDS.ZS.csv",
+      "indicator": "SH.MED.BEDS.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:20Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SH.MED.BEDS.ZS.csv",
+      "indicator": "SH.MED.BEDS.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:20Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SH.IMM.MEAS.csv",
+      "indicator": "SH.IMM.MEAS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:20Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SH.IMM.MEAS.csv",
+      "indicator": "SH.IMM.MEAS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:21Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SH.IMM.MEAS.csv",
+      "indicator": "SH.IMM.MEAS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:21Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SH.IMM.MEAS.csv",
+      "indicator": "SH.IMM.MEAS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:21Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SE.ADT.LITR.ZS.csv",
+      "indicator": "SE.ADT.LITR.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:22Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SE.ADT.LITR.ZS.csv",
+      "indicator": "SE.ADT.LITR.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:22Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SE.ADT.LITR.ZS.csv",
+      "indicator": "SE.ADT.LITR.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:22Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SE.ADT.LITR.ZS.csv",
+      "indicator": "SE.ADT.LITR.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:23Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SE.PRM.NENR.csv",
+      "indicator": "SE.PRM.NENR",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:23Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SE.PRM.NENR.csv",
+      "indicator": "SE.PRM.NENR",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:23Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SE.PRM.NENR.csv",
+      "indicator": "SE.PRM.NENR",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:24Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SE.PRM.NENR.csv",
+      "indicator": "SE.PRM.NENR",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:24Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SE.SEC.ENRR.csv",
+      "indicator": "SE.SEC.ENRR",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:24Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SE.SEC.ENRR.csv",
+      "indicator": "SE.SEC.ENRR",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:25Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SE.SEC.ENRR.csv",
+      "indicator": "SE.SEC.ENRR",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:25Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SE.SEC.ENRR.csv",
+      "indicator": "SE.SEC.ENRR",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:25Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SE.TER.ENRR.csv",
+      "indicator": "SE.TER.ENRR",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:26Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SE.TER.ENRR.csv",
+      "indicator": "SE.TER.ENRR",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:26Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SE.TER.ENRR.csv",
+      "indicator": "SE.TER.ENRR",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:26Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SE.TER.ENRR.csv",
+      "indicator": "SE.TER.ENRR",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:27Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SE.XPD.TOTL.GD.ZS.csv",
+      "indicator": "SE.XPD.TOTL.GD.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:27Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SE.XPD.TOTL.GD.ZS.csv",
+      "indicator": "SE.XPD.TOTL.GD.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:27Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SE.XPD.TOTL.GD.ZS.csv",
+      "indicator": "SE.XPD.TOTL.GD.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:28Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SE.XPD.TOTL.GD.ZS.csv",
+      "indicator": "SE.XPD.TOTL.GD.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:28Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SE.PRM.CMPT.ZS.csv",
+      "indicator": "SE.PRM.CMPT.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:29Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SE.PRM.CMPT.ZS.csv",
+      "indicator": "SE.PRM.CMPT.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:29Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SE.PRM.CMPT.ZS.csv",
+      "indicator": "SE.PRM.CMPT.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:29Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SE.PRM.CMPT.ZS.csv",
+      "indicator": "SE.PRM.CMPT.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:29Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SI.POV.DDAY.csv",
+      "indicator": "SI.POV.DDAY",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:30Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SI.POV.DDAY.csv",
+      "indicator": "SI.POV.DDAY",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:30Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SI.POV.DDAY.csv",
+      "indicator": "SI.POV.DDAY",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:30Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SI.POV.DDAY.csv",
+      "indicator": "SI.POV.DDAY",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:30Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SI.POV.UMIC.csv",
+      "indicator": "SI.POV.UMIC",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:31Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SI.POV.UMIC.csv",
+      "indicator": "SI.POV.UMIC",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:31Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SI.POV.UMIC.csv",
+      "indicator": "SI.POV.UMIC",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:32Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SI.POV.UMIC.csv",
+      "indicator": "SI.POV.UMIC",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:32Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SI.POV.GINI.csv",
+      "indicator": "SI.POV.GINI",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:32Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SI.POV.GINI.csv",
+      "indicator": "SI.POV.GINI",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:33Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SI.POV.GINI.csv",
+      "indicator": "SI.POV.GINI",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:33Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SI.POV.GINI.csv",
+      "indicator": "SI.POV.GINI",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:33Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SL.TLF.CACT.FE.ZS.csv",
+      "indicator": "SL.TLF.CACT.FE.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:34Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SL.TLF.CACT.FE.ZS.csv",
+      "indicator": "SL.TLF.CACT.FE.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:34Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SL.TLF.CACT.FE.ZS.csv",
+      "indicator": "SL.TLF.CACT.FE.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:34Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SL.TLF.CACT.FE.ZS.csv",
+      "indicator": "SL.TLF.CACT.FE.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:35Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SG.GEN.PARL.ZS.csv",
+      "indicator": "SG.GEN.PARL.ZS",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:35Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SG.GEN.PARL.ZS.csv",
+      "indicator": "SG.GEN.PARL.ZS",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:35Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SG.GEN.PARL.ZS.csv",
+      "indicator": "SG.GEN.PARL.ZS",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:36Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SG.GEN.PARL.ZS.csv",
+      "indicator": "SG.GEN.PARL.ZS",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:36Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/SP.ADO.TFRT.csv",
+      "indicator": "SP.ADO.TFRT",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:37Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/SP.ADO.TFRT.csv",
+      "indicator": "SP.ADO.TFRT",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:37Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/SP.ADO.TFRT.csv",
+      "indicator": "SP.ADO.TFRT",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:37Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/SP.ADO.TFRT.csv",
+      "indicator": "SP.ADO.TFRT",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:38Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/ST.INT.ARVL.csv",
+      "indicator": "ST.INT.ARVL",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:38Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/ST.INT.ARVL.csv",
+      "indicator": "ST.INT.ARVL",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:38Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/ST.INT.ARVL.csv",
+      "indicator": "ST.INT.ARVL",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:39Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/ST.INT.ARVL.csv",
+      "indicator": "ST.INT.ARVL",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:39Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/ST.INT.RCPT.CD.csv",
+      "indicator": "ST.INT.RCPT.CD",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:39Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/ST.INT.RCPT.CD.csv",
+      "indicator": "ST.INT.RCPT.CD",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:39Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/ST.INT.RCPT.CD.csv",
+      "indicator": "ST.INT.RCPT.CD",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:40Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/ST.INT.RCPT.CD.csv",
+      "indicator": "ST.INT.RCPT.CD",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:40Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/BZ/ST.INT.XPND.CD.csv",
+      "indicator": "ST.INT.XPND.CD",
+      "country": "BZ",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:40Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/JM/ST.INT.XPND.CD.csv",
+      "indicator": "ST.INT.XPND.CD",
+      "country": "JM",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:40Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/TT/ST.INT.XPND.CD.csv",
+      "indicator": "ST.INT.XPND.CD",
+      "country": "TT",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:41Z"
+    },
+    {
+      "path": "/home/runner/work/open-data-caribbean/open-data-caribbean/data/world_bank/GY/ST.INT.XPND.CD.csv",
+      "indicator": "ST.INT.XPND.CD",
+      "country": "GY",
+      "rows": 65,
+      "updated_at": "2025-08-24T17:05:41Z"
+    }
+  ]
+}
