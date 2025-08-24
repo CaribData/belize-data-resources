@@ -61,43 +61,57 @@ jobs:
           ref: gh-pages
           path: ghp
           fetch-depth: 0
+
       - name: Download built data
         uses: actions/download-artifact@v4
         with:
           name: data-package
           path: pkg
-      - name: Stage per-tag dataset under gh-pages/data/<TAG>/ (with debug)
+
+      - name: Sanity check artifact contents
         run: |
           set -euo pipefail
-          echo "DEBUG: listing artifact dirs (depth<=2)"
-          find pkg -maxdepth 2 -type d -print || true
+          echo "Artifact files count: $(find pkg -type f | wc -l)"
+          CSVS=$(find pkg/data -type f -name "*.csv" | wc -l || echo 0)
+          echo "CSV files found: ${CSVS}"
+          if [ "${CSVS}" -eq 0 ]; then
+            echo "ERROR: No CSVs in artifact (pkg/data). Aborting Pages publish."
+            exit 1
+          fi
 
-          echo "DEBUG: first 60 artifact files"
-          set +o pipefail
-          find pkg -type f | head -n 60 || true
-          set -o pipefail
-
-          echo "DEBUG: CSV count in pkg/data"
-          find pkg/data -type f -name "*.csv" | wc -l || true
-
+      - name: Publish to gh-pages/data/<TAG>/
+        run: |
+          set -euo pipefail
           mkdir -p "ghp/data/${TAG}"
           rsync -a --delete "pkg/data/" "ghp/data/${TAG}/"
 
+          # Write tag index + latest marker
           ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           printf '{\n  "tag": "%s",\n  "published_at": "%s"\n}\n' "$TAG" "$ts" > "ghp/data/${TAG}/_index.json"
           printf '{\n  "tag": "%s",\n  "published_at": "%s"\n}\n' "$TAG" "$ts" > "ghp/data/latest.json"
 
-          echo "DEBUG: staged files (first 60)"
-          set +o pipefail
-          find "ghp/data/${TAG}" -type f | head -n 60 || true
-          set -o pipefail
+          # Ensure Pages doesn’t Jekyll-filter our /data tree
+          touch ghp/.nojekyll
+
+          echo "DEBUG: staged path counts"
+          echo "files: $(find ghp/data/${TAG} -type f | wc -l)"
+          echo "csvs : $(find ghp/data/${TAG} -type f -name "*.csv" | wc -l)"
 
           cd ghp
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add -A
+          git status --porcelain
           git commit -m "Publish Open Data for ${TAG} to Pages" || echo "No changes to commit"
           git push
+
+      - name: Upload Pages snapshot (debug)
+        uses: actions/upload-artifact@v4
+        with:
+          name: pages-snapshot-${{ env.TAG }}
+          path: |
+            ghp/data/${{ env.TAG }}/
+            ghp/data/latest.json
 
   release:
     needs: build
@@ -112,11 +126,6 @@ jobs:
       - name: Verify artifact (debug)
         run: |
           set -euo pipefail
-          echo "DEBUG: artifact tree (first 120 files)"
-          set +o pipefail
-          find data-package -type f | head -n 120 || true
-          set -o pipefail
-          echo "DEBUG: counts"
           echo "files:" $(find data-package -type f | wc -l)
           echo "csvs :" $(find data-package -type f -name "*.csv" | wc -l)
 
@@ -127,11 +136,6 @@ jobs:
           mkdir -p stage dist
           rsync -a data-package/data/ stage/data/
           cp -f data-package/catalog.yml stage/catalog.yml
-          echo "DEBUG: stage contents (first 120 files)"
-          set +o pipefail
-          find stage -type f | head -n 120 || true
-          set -o pipefail
-          echo "files:" $(find stage -type f | wc -l)
 
       - name: Package ZIP + small assets + checksums
         run: |
@@ -139,7 +143,6 @@ jobs:
           TAG="${GITHUB_REF#refs/tags/}"
           ZIP="open-data-caribbean_${TAG}.zip"
           (cd stage && zip -r "../dist/${ZIP}" . >/dev/null)
-          # Small assets for pipelines
           cp stage/data/world_bank/_dictionary.csv dist/world_bank_dictionary.csv || true
           cp stage/data/world_bank/_manifest.json  dist/world_bank_manifest.json  || true
           cp stage/data/faostat_fbs/_manifest.json dist/faostat_manifest.json     || true
@@ -147,8 +150,6 @@ jobs:
           cp stage/data/_quality_report.csv        dist/quality_report.csv        || true
           cp stage/data/_quality_report.json       dist/quality_report.json       || true
           (cd dist && sha256sum *.csv *.json *.zip 2>/dev/null | tee SHA256SUMS.txt || true)
-          echo "DEBUG: dist listing"
-          ls -lah dist
 
       - name: Create/Update GitHub Release (attach data assets)
         uses: softprops/action-gh-release@v2
