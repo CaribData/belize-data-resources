@@ -59,7 +59,8 @@ jobs:
           echo "Messy tags:"
           [ -d ghp/data/messy ] && ls -1 ghp/data/messy | sort -V || echo "(no messy/)"
 
-      - name: Generate Downloads page
+      - name: Generate Downloads page (with short descriptions)
+        shell: bash
         run: |
           set -euo pipefail
           mkdir -p docs
@@ -68,45 +69,71 @@ jobs:
           BASE_URL="https://${OWNER}.github.io/${REPO}"
           urlencode_path () { local in="$1"; in="${in// /%20}"; in="${in//(/%28}"; in="${in//)/%29}"; in="${in//&/%26}"; in="${in//#/%23}"; echo "$in"; }
 
+          # Latest Open Data tag (from latest.json or last tag dir)
           LATEST_TAG=""
-          if [ -f ghp/data/latest.json ]; then
-            LATEST_TAG="$(grep -oE '"tag"\s*:\s*"[^"]+"' ghp/data/latest.json | sed -E 's/.*"tag"\s*:\s*"([^"]+)".*/\1/' || true)"
-          fi
-          if [ -z "$LATEST_TAG" ]; then
-            LATEST_TAG="$(find ghp/data -mindepth 1 -maxdepth 1 -type d -printf "%f\n" 2>/dev/null | grep -E '^(v|od-)' | sort -V | tail -n 1 || true)"
-          fi
+          [ -f ghp/data/latest.json ] && LATEST_TAG="$(grep -oE '"tag"\s*:\s*"[^"]+"' ghp/data/latest.json | sed -E 's/.*"tag"\s*:\s*"([^"]+)".*/\1/' || true)"
+          [ -z "$LATEST_TAG" ] && LATEST_TAG="$(find ghp/data -mindepth 1 -maxdepth 1 -type d -printf "%f\n" 2>/dev/null | grep -E '^(v|od-)' | sort -V | tail -n 1 || true)"
 
+          # Latest Messy tag (lexicographic)
           MESSY_TAG=""
-          if [ -d ghp/data/messy ]; then
-            MESSY_TAG="$(ls -1 ghp/data/messy | sort -V | tail -n 1 || true)"
+          [ -d ghp/data/messy ] && MESSY_TAG="$(ls -1 ghp/data/messy | sort -V | tail -n 1 || true)"
+
+          # Build a (best-effort) map CODE -> NAME from world_bank/_dictionary.csv
+          DICT_TSV=""
+          if [ -n "$LATEST_TAG" ] && [ -f "ghp/data/$LATEST_TAG/world_bank/_dictionary.csv" ]; then
+            DICT_TSV="$(mktemp)"
+            # Assumes first two columns are code,name and names rarely contain commas.
+            # If quoted names have commas, this may truncate; upgrade path is to emit a JSON map during data build.
+            awk -F',' 'NR>1 {code=$1;name=$2; gsub(/^"|"$/,"",code); gsub(/^"|"$/,"",name); if(code!="") print code "\t" name}' \
+              "ghp/data/$LATEST_TAG/world_bank/_dictionary.csv" > "$DICT_TSV" || true
+            echo "Built dictionary map at $DICT_TSV (lines: $(wc -l < "$DICT_TSV" || echo 0))"
           fi
 
           {
             echo "# Downloads"
             echo
+
+            # ------- Open Data -------
             if [ -n "$LATEST_TAG" ] && [ -d "ghp/data/$LATEST_TAG" ]; then
               echo "## Open Data — Latest: \`$LATEST_TAG\`"
               echo
               for p in "_freshness.json" "_quality_report.csv" "_quality_report.json" "world_bank/_dictionary.csv" "world_bank/_manifest.json" "faostat_fbs/_manifest.json"; do
-                [ -f "ghp/data/$LATEST_TAG/$p" ] && rel="data/$LATEST_TAG/$p" && echo "- [$p](${BASE_URL}/$(urlencode_path "$rel"))"
+                if [ -f "ghp/data/$LATEST_TAG/$p" ]; then
+                  rel="data/$LATEST_TAG/$p"
+                  echo "- [$p](${BASE_URL}/$(urlencode_path "$rel"))"
+                fi
               done
               echo
+
+              # World Bank CSVs with descriptions
               if [ -d "ghp/data/$LATEST_TAG/world_bank" ]; then
                 echo "### World Bank CSVs"
                 for country in $(find "ghp/data/$LATEST_TAG/world_bank" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort); do
                   echo "- **$country**"
                   for f in $(find "ghp/data/$LATEST_TAG/world_bank/$country" -type f -name "*.csv" | sort); do
-                    bn="$(basename "$f")"; rel="${f#ghp/}"
-                    echo "  - [$bn](${BASE_URL}/$(urlencode_path "$rel"))"
+                    bn="$(basename "$f")"; rel="${f#ghp/}"; code="${bn%.csv}"
+                    desc=""
+                    if [ -n "$DICT_TSV" ]; then
+                      # exact code match at start of line + tab
+                      desc="$(grep -m1 -F "${code}\t" "$DICT_TSV" | cut -f2- || true)"
+                    fi
+                    if [ -n "$desc" ]; then
+                      echo "  - [$bn](${BASE_URL}/$(urlencode_path "$rel")) — $desc"
+                    else
+                      echo "  - [$bn](${BASE_URL}/$(urlencode_path "$rel"))"
+                    fi
                   done
                 done
                 echo
               fi
+
+              # FAOSTAT FBS CSVs (simple label)
               if [ -d "ghp/data/$LATEST_TAG/faostat_fbs" ]; then
                 echo "### FAOSTAT FBS CSVs"
                 for f in $(find "ghp/data/$LATEST_TAG/faostat_fbs" -type f -name "*_fbs.csv" | sort); do
                   bn="$(basename "$f")"; rel="${f#ghp/}"
-                  echo "- [$bn](${BASE_URL}/$(urlencode_path "$rel"))"
+                  iso3="${bn%_fbs.csv}"
+                  echo "- [$bn](${BASE_URL}/$(urlencode_path "$rel")) — FAOSTAT Food Balance Sheets (${iso3})"
                 done
                 echo
               fi
@@ -115,6 +142,7 @@ jobs:
               echo
             fi
 
+            # ------- Messy -------
             echo "## Messy Data (Belize)"
             if [ -n "$MESSY_TAG" ] && [ -d "ghp/data/messy/$MESSY_TAG" ]; then
               echo "_Latest messy tag:_ \`$MESSY_TAG\`"
@@ -139,6 +167,7 @@ jobs:
               echo
             fi
 
+            # ------- All Open Data tags -------
             echo "## All Open Data tags"
             TAGS="$(find ghp/data -mindepth 1 -maxdepth 1 -type d -printf "%f\n" 2>/dev/null | grep -E '^(v|od-)' | sort -V || true)"
             if [ -n "$TAGS" ]; then
