@@ -69,18 +69,29 @@ jobs:
       - name: Stage per-tag dataset under gh-pages/data/<TAG>/ (with debug)
         run: |
           set -euo pipefail
-          echo "DEBUG: listing artifact contents"
-          find pkg -maxdepth 2 -type d -print
-          find pkg -type f | head -n 40
-          echo "DEBUG: counting CSVs"
+          echo "DEBUG: listing artifact dirs (depth<=2)"
+          find pkg -maxdepth 2 -type d -print || true
+
+          echo "DEBUG: first 60 artifact files"
+          set +o pipefail
+          find pkg -type f | head -n 60 || true
+          set -o pipefail
+
+          echo "DEBUG: CSV count in pkg/data"
           find pkg/data -type f -name "*.csv" | wc -l || true
+
           mkdir -p "ghp/data/${TAG}"
           rsync -a --delete "pkg/data/" "ghp/data/${TAG}/"
+
           ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           printf '{\n  "tag": "%s",\n  "published_at": "%s"\n}\n' "$TAG" "$ts" > "ghp/data/${TAG}/_index.json"
           printf '{\n  "tag": "%s",\n  "published_at": "%s"\n}\n' "$TAG" "$ts" > "ghp/data/latest.json"
-          echo "DEBUG: staged files:"
-          find "ghp/data/${TAG}" -type f | head -n 60
+
+          echo "DEBUG: staged files (first 60)"
+          set +o pipefail
+          find "ghp/data/${TAG}" -type f | head -n 60 || true
+          set -o pipefail
+
           cd ghp
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -102,7 +113,9 @@ jobs:
         run: |
           set -euo pipefail
           echo "DEBUG: artifact tree (first 120 files)"
-          find data-package -type f | head -n 120
+          set +o pipefail
+          find data-package -type f | head -n 120 || true
+          set -o pipefail
           echo "DEBUG: counts"
           echo "files:" $(find data-package -type f | wc -l)
           echo "csvs :" $(find data-package -type f -name "*.csv" | wc -l)
@@ -114,8 +127,10 @@ jobs:
           mkdir -p stage dist
           rsync -a data-package/data/ stage/data/
           cp -f data-package/catalog.yml stage/catalog.yml
-          echo "DEBUG: stage contents"
-          find stage -type f | head -n 120
+          echo "DEBUG: stage contents (first 120 files)"
+          set +o pipefail
+          find stage -type f | head -n 120 || true
+          set -o pipefail
           echo "files:" $(find stage -type f | wc -l)
 
       - name: Package ZIP + small assets + checksums
