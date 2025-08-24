@@ -7,6 +7,7 @@ on:
       - "docs/**"
       - "mkdocs.yml"
       - "requirements.txt"
+      - "scripts/gen_downloads.py"
   workflow_dispatch:
   workflow_run:
     workflows:
@@ -40,7 +41,7 @@ jobs:
           pip install mkdocs mkdocs-material
           mkdocs --version
 
-      # Read-only checkout of gh-pages so we can list /data/<TAG>/...
+      # Read-only gh-pages so we can list /data/<TAG>/...
       - name: Checkout gh-pages (read-only)
         uses: actions/checkout@v4
         continue-on-error: true
@@ -57,154 +58,10 @@ jobs:
           ls -la ghp/data || true
           [ -f ghp/data/latest.json ] && { echo "latest.json:"; cat ghp/data/latest.json; } || echo "(no latest.json)"
 
-      # Generate docs/downloads.md (Python; robust CSV parsing + descriptions)
       - name: Generate Downloads page (Python)
-        shell: bash
         run: |
           set -eux
-          cat > gen_downloads.py << 'PY'
-import os, re, json, csv, pathlib
-from urllib.parse import quote
-
-BASE = pathlib.Path("ghp") / "data"
-DOCS = pathlib.Path("docs")
-DOCS.mkdir(parents=True, exist_ok=True)
-
-def latest_tag():
-    lj = BASE / "latest.json"
-    if lj.exists():
-        try:
-            return json.loads(lj.read_text(encoding="utf-8")).get("tag") or ""
-        except Exception:
-            pass
-    # fallback: highest-looking dir starting with v or od-
-    tags = [p.name for p in BASE.iterdir() if p.is_dir() and re.match(r'^(v|od-)', p.name)]
-    return sorted(tags)[-1] if tags else ""
-
-def latest_messy_tag():
-    mroot = BASE / "messy"
-    if not mroot.exists(): return ""
-    tags = [p.name for p in mroot.iterdir() if p.is_dir()]
-    return sorted(tags)[-1] if tags else ""
-
-def read_dictionary(path):
-    """Return dict: indicator_code -> indicator_name (robust to BOM/headers)."""
-    d = {}
-    if not path.exists(): return d
-    with open(path, "r", encoding="utf-8-sig", newline="") as f:
-        r = csv.reader(f)
-        rows = list(r)
-    if not rows: return d
-    headers = [h.strip().lower() for h in rows[0]]
-    # Guess columns
-    def idx(names, fallbacks):
-        for n in names:
-            if n in headers: return headers.index(n)
-        return fallbacks
-    code_i = idx(["indicator_code","code","id"], 0)
-    name_i = idx(["indicator_name","name","label","title"], 1 if len(headers)>1 else 0)
-    for row in rows[1:]:
-        if not row: continue
-        if code_i >= len(row): continue
-        code = row[code_i].strip().lstrip("\ufeff")
-        if not code: continue
-        name = row[name_i].strip() if name_i < len(row) else ""
-        d[code] = name
-    return d
-
-owner = os.environ.get("GITHUB_REPOSITORY_OWNER","CaribData")
-repo  = os.environ.get("GITHUB_REPOSITORY","CaribData/open-data-caribbean").split("/",1)[1]
-BASE_URL = f"https://{owner}.github.io/{repo}"
-
-tag = latest_tag()
-mtag = latest_messy_tag()
-
-lines = []
-lines.append("# Downloads\n")
-
-# -------- Open Data --------
-if tag and (BASE/tag).exists():
-    lines.append(f"## Open Data — Latest: `{tag}`\n")
-    quick = [
-        "_freshness.json",
-        "_quality_report.csv",
-        "_quality_report.json",
-        "world_bank/_dictionary.csv",
-        "world_bank/_manifest.json",
-        "faostat_fbs/_manifest.json",
-    ]
-    for p in quick:
-        if (BASE/tag/p).exists():
-            rel = f"data/{tag}/{p}"
-            lines.append(f"- [{p}]({BASE_URL}/{quote(rel)})")
-    lines.append("")
-
-    # World Bank CSVs + description from dictionary
-    wb_root = BASE/tag/"world_bank"
-    dmap = read_dictionary(wb_root/"_dictionary.csv")
-    if wb_root.exists():
-        lines.append("### World Bank CSVs")
-        for country in sorted([p.name for p in wb_root.iterdir() if p.is_dir()]):
-            lines.append(f"- **{country}**")
-            cdir = wb_root/country
-            for f in sorted(cdir.glob("*.csv")):
-                code = f.stem
-                desc = dmap.get(code, "")
-                rel = "data/" + str(f.relative_to("ghp"))
-                if desc:
-                    lines.append(f"  - [{f.name}]({BASE_URL}/{quote(rel)}) — {desc}")
-                else:
-                    lines.append(f"  - [{f.name}]({BASE_URL}/{quote(rel)})")
-        lines.append("")
-
-    # FAOSTAT FBS (simple description)
-    fbs_root = BASE/tag/"faostat_fbs"
-    if fbs_root.exists():
-        lines.append("### FAOSTAT FBS CSVs")
-        for f in sorted(fbs_root.glob("*_fbs.csv")):
-            iso3 = f.name[:-8] if f.name.endswith("_fbs.csv") else ""
-            rel = "data/" + str(f.relative_to("ghp"))
-            lines.append(f"- [{f.name}]({BASE_URL}/{quote(rel)}) — FAOSTAT Food Balance Sheets ({iso3})")
-        lines.append("")
-else:
-    lines.append("## Open Data — (no published tag found yet)\n")
-
-# -------- Messy --------
-lines.append("## Messy Data (Belize)")
-if mtag and (BASE/"messy"/mtag).exists():
-    lines.append(f"_Latest messy tag:_ `{mtag}`\n")
-    for p in ["_manifest.json","_report.json","_dataset_card.md"]:
-        fp = BASE/"messy"/mtag/p
-        if fp.exists():
-            rel = "data/" + str(fp.relative_to("ghp"))
-            lines.append(f"- [{p}]({BASE_URL}/{quote(rel)})")
-    lines.append("")
-    raw = BASE/"messy"/mtag/"raw"
-    if raw.exists():
-        lines.append("### Raw files")
-        for slug in sorted([p.name for p in raw.iterdir() if p.is_dir()]):
-            lines.append(f"- **{slug}**")
-            for f in sorted(raw/slug.glob("**/*")):
-                if f.is_file() and f.suffix.lower() in [".xlsx",".xls",".csv"]:
-                    rel = "data/" + str(f.relative_to("ghp"))
-                    lines.append(f"  - [{f.name}]({BASE_URL}/{quote(rel)})")
-        lines.append("")
-else:
-    lines.append("_No messy data published yet._\n")
-
-# -------- All tags --------
-tags = [p.name for p in BASE.iterdir() if p.is_dir() and re.match(r'^(v|od-)', p.name)]
-if tags:
-    lines.append("## All Open Data tags")
-    for t in sorted(tags):
-        lines.append(f"- [{t}]({BASE_URL}/data/{t}/)")
-    lines.append("")
-
-(pathlib.Path("docs")/"downloads.md").write_text("\n".join(lines), encoding="utf-8")
-print("Wrote docs/downloads.md with", len(lines), "lines")
-PY
-          python gen_downloads.py
-          echo "Preview:"
+          python scripts/gen_downloads.py
           head -n 80 docs/downloads.md || true
 
       - name: Build site
