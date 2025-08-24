@@ -39,7 +39,7 @@ jobs:
           pip install -r requirements.txt
           mkdocs --version
 
-      # Pull current gh-pages so we can read /data/... that was published by release workflows
+      # Pull current gh-pages so we can read /data/... published by release workflows
       - name: Checkout gh-pages (read-only)
         uses: actions/checkout@v4
         with:
@@ -47,64 +47,96 @@ jobs:
           path: ghp
           fetch-depth: 0
 
+      - name: Inspect gh-pages (debug)
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "DEBUG: gh-pages top-level:"
+          ls -la ghp || true
+          echo "DEBUG: gh-pages data/:"
+          ls -la ghp/data || true
+          echo "DEBUG: gh-pages latest.json:"
+          [ -f ghp/data/latest.json ] && cat ghp/data/latest.json || echo "(missing latest.json)"
+          echo "DEBUG: list available Open Data tags:"
+          find ghp/data -mindepth 1 -maxdepth 1 -type d -printf "%f\n" 2>/dev/null | sort -V || true
+          echo "DEBUG: list available Messy tags:"
+          [ -d ghp/data/messy ] && ls -1 ghp/data/messy | sort -V || echo "(no messy/)"
+
       # Generate docs/downloads.md from files actually present on gh-pages
       - name: Generate Downloads page
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p docs
-          BASE_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
 
-          # Helper to percent-encode common characters in path segments
+          # BASE_URL for HTTPS links
+          OWNER="${GITHUB_REPOSITORY_OWNER}"
+          REPO="${GITHUB_REPOSITORY#*/}"
+          BASE_URL="https://${OWNER}.github.io/${REPO}"
+
           urlencode_path () {
             local in="$1"
-            in="${in// /%20}"
-            in="${in//(/%28}"
-            in="${in//)/%29}"
-            in="${in//&/%26}"
-            in="${in//#/%23}"
+            in="${in// /%20}"; in="${in//(/%28}"; in="${in//)/%29}"
+            in="${in//&/%26}"; in="${in//#/%23}"
             echo "$in"
           }
 
-          # Latest Open Data tag (if any)
+          # 1) Determine latest Open Data tag
           LATEST_TAG=""
           if [ -f ghp/data/latest.json ]; then
-            LATEST_TAG="$(grep -oE '"tag"\s*:\s*"[^"]+"' ghp/data/latest.json | sed -E 's/.*"tag"\s*:\s*"([^"]+)".*/\1/')"
+            # Try jq, else grep fallback
+            if command -v jq >/dev/null 2>&1; then
+              LATEST_TAG="$(jq -r '.tag // empty' ghp/data/latest.json || true)"
+            fi
+            if [ -z "$LATEST_TAG" ]; then
+              LATEST_TAG="$(grep -oE '"tag"\s*:\s*"[^"]+"' ghp/data/latest.json | sed -E 's/.*"tag"\s*:\s*"([^"]+)".*/\1/' || true)"
+            fi
+          fi
+          # Fallback: pick lexicographically last tag dir that starts with v or od-
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG="$(find ghp/data -mindepth 1 -maxdepth 1 -type d -printf "%f\n" 2>/dev/null | grep -E '^(v|od-)' | sort -V | tail -n 1 || true)"
+          fi
+
+          # 2) Determine latest Messy tag
+          MESSY_TAG=""
+          if [ -d ghp/data/messy ]; then
+            MESSY_TAG="$(ls -1 ghp/data/messy | sort -V | tail -n 1 || true)"
           fi
 
           {
             echo "# Downloads"
             echo
+
+            # ------- Open Data section -------
             if [ -n "$LATEST_TAG" ] && [ -d "ghp/data/$LATEST_TAG" ]; then
               echo "## Open Data — Latest: \`$LATEST_TAG\`"
-              echo ""
-              echo "**Quick links**"
-              for p in "_freshness.json" "_quality_report.csv" "_quality_report.json"; do
-                if [ -f "ghp/data/$LATEST_TAG/$p" ]; then
-                  rel="data/$LATEST_TAG/$p"
-                  echo "- [$p](${BASE_URL}/$(urlencode_path "$rel"))"
-                fi
-              done
-              for p in "world_bank/_dictionary.csv" "world_bank/_manifest.json" "faostat_fbs/_manifest.json"; do
+              echo
+              # Quick links
+              for p in "_freshness.json" "_quality_report.csv" "_quality_report.json" "world_bank/_dictionary.csv" "world_bank/_manifest.json" "faostat_fbs/_manifest.json"; do
                 if [ -f "ghp/data/$LATEST_TAG/$p" ]; then
                   rel="data/$LATEST_TAG/$p"
                   echo "- [$p](${BASE_URL}/$(urlencode_path "$rel"))"
                 fi
               done
               echo
+
               # World Bank per-country CSVs
               if [ -d "ghp/data/$LATEST_TAG/world_bank" ]; then
                 echo "### World Bank CSVs"
-                for country in $(find "ghp/data/$LATEST_TAG/world_bank" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort); do
+                # list country subfolders
+                while IFS= read -r country; do
+                  [ -z "$country" ] && continue
                   echo "- **$country**"
+                  # list CSVs
                   while IFS= read -r f; do
                     bn="$(basename "$f")"
-                    rel="${f#ghp/}"     # strip leading ghp/
+                    rel="${f#ghp/}"
                     echo "  - [$bn](${BASE_URL}/$(urlencode_path "$rel"))"
                   done < <(find "ghp/data/$LATEST_TAG/world_bank/$country" -type f -name "*.csv" | sort)
-                done
+                done < <(find "ghp/data/$LATEST_TAG/world_bank" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort)
                 echo
               fi
+
               # FAOSTAT FBS CSVs
               if [ -d "ghp/data/$LATEST_TAG/faostat_fbs" ]; then
                 echo "### FAOSTAT FBS CSVs"
@@ -120,30 +152,29 @@ jobs:
               echo
             fi
 
-            # Messy Data latest (pick the lexicographically last tag dir)
+            # ------- Messy section -------
             echo "## Messy Data (Belize)"
-            if [ -d "ghp/data/messy" ] && ls -1 "ghp/data/messy" >/dev/null 2>&1; then
-              MTAG="$(ls -1 ghp/data/messy | sort -V | tail -n 1)"
-              echo "_Latest messy tag:_ \`$MTAG\`"
+            if [ -n "$MESSY_TAG" ] && [ -d "ghp/data/messy/$MESSY_TAG" ]; then
+              echo "_Latest messy tag:_ \`$MESSY_TAG\`"
               echo
               for p in "_manifest.json" "_report.json" "_dataset_card.md"; do
-                if [ -f "ghp/data/messy/$MTAG/$p" ]; then
-                  rel="data/messy/$MTAG/$p"
+                if [ -f "ghp/data/messy/$MESSY_TAG/$p" ]; then
+                  rel="data/messy/$MESSY_TAG/$p"
                   echo "- [$p](${BASE_URL}/$(urlencode_path "$rel"))"
                 fi
               done
               echo
               echo "### Raw files"
-              if [ -d "ghp/data/messy/$MTAG/raw" ]; then
-                # List per slug
-                for slug in $(find "ghp/data/messy/$MTAG/raw" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort); do
+              if [ -d "ghp/data/messy/$MESSY_TAG/raw" ]; then
+                while IFS= read -r slug; do
+                  [ -z "$slug" ] && continue
                   echo "- **$slug**"
                   while IFS= read -r f; do
                     bn="$(basename "$f")"
                     rel="${f#ghp/}"
                     echo "  - [$bn](${BASE_URL}/$(urlencode_path "$rel"))"
-                  done < <(find "ghp/data/messy/$MTAG/raw/$slug" -type f \( -iname "*.xlsx" -o -iname "*.xls" -o -iname "*.csv" \) | sort)
-                done
+                  done < <(find "ghp/data/messy/$MESSY_TAG/raw/$slug" -type f \( -iname "*.xlsx" -o -iname "*.xls" -o -iname "*.csv" \) | sort)
+                done < <(find "ghp/data/messy/$MESSY_TAG/raw" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort)
                 echo
               fi
             else
@@ -151,22 +182,19 @@ jobs:
               echo
             fi
 
-            # All available Open Data tags (for pinning)
-            if [ -d "ghp/data" ]; then
-              echo "## All Open Data tags"
-              TAGS="$(find ghp/data -mindepth 1 -maxdepth 1 -type d -printf "%f\n" \
-                     | grep -E '^(v|od-)' | sort -V)"
-              if [ -n "$TAGS" ]; then
-                while IFS= read -r t; do
-                  echo "- [$t](${BASE_URL}/data/$(urlencode_path "$t")/)"
-                done <<< "$TAGS"
-                echo
-              fi
+            # ------- All Open Data tags -------
+            echo "## All Open Data tags"
+            TAGS="$(find ghp/data -mindepth 1 -maxdepth 1 -type d -printf "%f\n" 2>/dev/null | grep -E '^(v|od-)' | sort -V)"
+            if [ -n "$TAGS" ]; then
+              while IFS= read -r t; do
+                echo "- [$t](${BASE_URL}/data/$(urlencode_path "$t")/)"
+              done <<< "$TAGS"
+              echo
             fi
           } > docs/downloads.md
 
-          echo "Generated docs/downloads.md:"
-          head -n 60 docs/downloads.md || true
+          echo "DEBUG: first lines of generated docs/downloads.md"
+          head -n 80 docs/downloads.md || true
 
       - name: Build site
         run: mkdocs build --strict
