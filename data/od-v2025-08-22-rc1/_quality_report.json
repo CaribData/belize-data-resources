@@ -1,0 +1,662 @@
+[
+  {
+    "path": "data/faostat_fbs/GUY_fbs.csv",
+    "rows": 2647,
+    "columns": [
+      "area_code",
+      "area",
+      "item_code",
+      "item",
+      "element",
+      "year",
+      "unit",
+      "value",
+      "_source",
+      "_domain"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 0.0
+  },
+  {
+    "path": "data/faostat_fbs/JAM_fbs.csv",
+    "rows": 2632,
+    "columns": [
+      "area_code",
+      "area",
+      "item_code",
+      "item",
+      "element",
+      "year",
+      "unit",
+      "value",
+      "_source",
+      "_domain"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 0.0
+  },
+  {
+    "path": "data/faostat_fbs/BLZ_fbs.csv",
+    "rows": 2672,
+    "columns": [
+      "area_code",
+      "area",
+      "item_code",
+      "item",
+      "element",
+      "year",
+      "unit",
+      "value",
+      "_source",
+      "_domain"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 0.0
+  },
+  {
+    "path": "data/faostat_fbs/TTO_fbs.csv",
+    "rows": 2693,
+    "columns": [
+      "area_code",
+      "area",
+      "item_code",
+      "item",
+      "element",
+      "year",
+      "unit",
+      "value",
+      "_source",
+      "_domain"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 0.0
+  },
+  {
+    "path": "data/world_bank/_dictionary.csv",
+    "rows": 42,
+    "columns": [
+      "indicator_code",
+      "name",
+      "unit",
+      "group",
+      "wb_name",
+      "wb_source_note"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 0.79
+  },
+  {
+    "path": "data/world_bank/BZ/SH.XPD.CHEX.PC.CD.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 10.77
+  },
+  {
+    "path": "data/world_bank/BZ/SG.GEN.PARL.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 9.49
+  },
+  {
+    "path": "data/world_bank/BZ/NE.IMP.GNFS.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 5.38
+  },
+  {
+    "path": "data/world_bank/BZ/SE.PRM.NENR.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 11.79
+  },
+  {
+    "path": "data/world_bank/BZ/NY.GDP.PCAP.CD.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 0.0
+  },
+  {
+    "path": "data/world_bank/BZ/GC.TAX.TOTL.GD.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 9.49
+  },
+  {
+    "path": "data/world_bank/BZ/SH.MED.BEDS.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 10.51
+  },
+  {
+    "path": "data/world_bank/BZ/SP.ADO.TFRT.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 0.26
+  },
+  {
+    "path": "data/world_bank/BZ/NE.TRD.GNFS.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 5.38
+  },
+  {
+    "path": "data/world_bank/BZ/ST.INT.XPND.CD.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 10.0
+  },
+  {
+    "path": "data/world_bank/BZ/SI.POV.DDAY.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 14.62
+  },
+  {
+    "path": "data/world_bank/BZ/SL.EMP.TOTL.SP.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 7.95
+  },
+  {
+    "path": "data/world_bank/BZ/SI.POV.UMIC.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 14.62
+  },
+  {
+    "path": "data/world_bank/BZ/SL.UEM.TOTL.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 7.95
+  },
+  {
+    "path": "data/world_bank/BZ/NY.GDP.MKTP.CD.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 0.0
+  },
+  {
+    "path": "data/world_bank/BZ/SE.XPD.TOTL.GD.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 11.28
+  },
+  {
+    "path": "data/world_bank/BZ/SL.TLF.TOTL.IN.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 7.69
+  },
+  {
+    "path": "data/world_bank/BZ/SI.POV.GINI.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 31.28
+  },
+  {
+    "path": "data/world_bank/BZ/FP.CPI.TOTL.ZG.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 5.38
+  },
+  {
+    "path": "data/world_bank/BZ/ST.INT.RCPT.CD.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 15.9
+  },
+  {
+    "path": "data/world_bank/BZ/SH.IMM.MEAS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 5.38
+  },
+  {
+    "path": "data/world_bank/BZ/SL.UEM.1524.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 7.95
+  },
+  {
+    "path": "data/world_bank/BZ/GC.XPN.TOTL.GD.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 9.49
+  },
+  {
+    "path": "data/world_bank/BZ/NV.IND.TOTL.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 4.87
+  },
+  {
+    "path": "data/world_bank/BZ/IT.NET.USER.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 9.49
+  },
+  {
+    "path": "data/world_bank/BZ/BN.CAB.XOKA.GD.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 6.15
+  },
+  {
+    "path": "data/world_bank/BZ/NV.AGR.TOTL.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 4.87
+  },
+  {
+    "path": "data/world_bank/BZ/SL.TLF.CACT.FE.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 7.69
+  },
+  {
+    "path": "data/world_bank/BZ/NE.EXP.GNFS.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 5.38
+  },
+  {
+    "path": "data/world_bank/BZ/SH.XPD.CHEX.GD.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 10.77
+  },
+  {
+    "path": "data/world_bank/BZ/SP.POP.TOTL.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 0.0
+  },
+  {
+    "path": "data/world_bank/BZ/SE.PRM.CMPT.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 9.74
+  },
+  {
+    "path": "data/world_bank/BZ/ST.INT.ARVL.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 10.0
+  },
+  {
+    "path": "data/world_bank/BZ/SE.SEC.ENRR.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 8.46
+  },
+  {
+    "path": "data/world_bank/BZ/NE.GDI.TOTL.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 5.38
+  },
+  {
+    "path": "data/world_bank/BZ/SE.ADT.LITR.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 15.9
+  },
+  {
+    "path": "data/world_bank/BZ/EG.ELC.ACCS.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 8.21
+  },
+  {
+    "path": "data/world_bank/BZ/SP.DYN.LE00.IN.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 0.26
+  },
+  {
+    "path": "data/world_bank/BZ/SE.TER.ENRR.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 9.74
+  },
+  {
+    "path": "data/world_bank/BZ/SP.URB.TOTL.IN.ZS.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 0.0
+  },
+  {
+    "path": "data/world_bank/BZ/SP.DYN.TFRT.IN.csv",
+    "rows": 65,
+    "columns": [
+      "country",
+      "iso2c",
+      "year",
+      "indicator",
+      "value",
+      "unit"
+    ],
+    "duplicate_rows": 0,
+    "missing_percent": 16.92
+  }
+]

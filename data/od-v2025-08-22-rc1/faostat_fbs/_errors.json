@@ -1,0 +1,26 @@
+[
+  {
+    "stage": "fao_api_fetch",
+    "country_iso3": "BLZ",
+    "domain": "FBS/FBS",
+    "error": "521 Server Error:  for url: https://fenixservices.fao.org/faostat/api/v1/en/FBS/FBS?area_code=84&per_page=50000"
+  },
+  {
+    "stage": "fao_api_fetch",
+    "country_iso3": "JAM",
+    "domain": "FBS/FBS",
+    "error": "521 Server Error:  for url: https://fenixservices.fao.org/faostat/api/v1/en/FBS/FBS?area_code=388&per_page=50000"
+  },
+  {
+    "stage": "fao_api_fetch",
+    "country_iso3": "TTO",
+    "domain": "FBS/FBS",
+    "error": "521 Server Error:  for url: https://fenixservices.fao.org/faostat/api/v1/en/FBS/FBS?area_code=780&per_page=50000"
+  },
+  {
+    "stage": "fao_api_fetch",
+    "country_iso3": "GUY",
+    "domain": "FBS/FBS",
+    "error": "521 Server Error:  for url: https://fenixservices.fao.org/faostat/api/v1/en/FBS/FBS?area_code=328&per_page=50000"
+  }
+]
