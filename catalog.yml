@@ -1,6 +1,6 @@
 project:
   name: CaribData Open Data Repository
-  countries: ["BZ", "JM", "TT", "GY"]
+  countries: ["BZ"]
   out_dir: "data"
   cache_dir: ".cache"
   cache_ttl_hours: 24
