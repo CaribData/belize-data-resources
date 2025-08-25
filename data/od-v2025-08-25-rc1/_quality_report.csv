@@ -1,0 +1,47 @@
+path,rows,columns,duplicate_rows,missing_percent
+data/faostat_fbs/GUY_fbs.csv,2647,"['area_code', 'area', 'item_code', 'item', 'element', 'year', 'unit', 'value', '_source', '_domain']",0,0.0
+data/faostat_fbs/JAM_fbs.csv,2632,"['area_code', 'area', 'item_code', 'item', 'element', 'year', 'unit', 'value', '_source', '_domain']",0,0.0
+data/faostat_fbs/BLZ_fbs.csv,2672,"['area_code', 'area', 'item_code', 'item', 'element', 'year', 'unit', 'value', '_source', '_domain']",0,0.0
+data/faostat_fbs/TTO_fbs.csv,2693,"['area_code', 'area', 'item_code', 'item', 'element', 'year', 'unit', 'value', '_source', '_domain']",0,0.0
+data/world_bank/_dictionary.csv,42,"['indicator_code', 'name', 'unit', 'group', 'wb_name', 'wb_source_note']",0,0.79
+data/world_bank/BZ/SH.XPD.CHEX.PC.CD.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,10.77
+data/world_bank/BZ/SG.GEN.PARL.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,9.49
+data/world_bank/BZ/NE.IMP.GNFS.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,5.38
+data/world_bank/BZ/SE.PRM.NENR.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,11.79
+data/world_bank/BZ/NY.GDP.PCAP.CD.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,0.0
+data/world_bank/BZ/GC.TAX.TOTL.GD.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,9.49
+data/world_bank/BZ/SH.MED.BEDS.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,10.51
+data/world_bank/BZ/SP.ADO.TFRT.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,0.26
+data/world_bank/BZ/NE.TRD.GNFS.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,5.38
+data/world_bank/BZ/ST.INT.XPND.CD.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,10.0
+data/world_bank/BZ/SI.POV.DDAY.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,14.62
+data/world_bank/BZ/SL.EMP.TOTL.SP.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,7.95
+data/world_bank/BZ/SI.POV.UMIC.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,14.62
+data/world_bank/BZ/SL.UEM.TOTL.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,7.95
+data/world_bank/BZ/NY.GDP.MKTP.CD.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,0.0
+data/world_bank/BZ/SE.XPD.TOTL.GD.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,11.28
+data/world_bank/BZ/SL.TLF.TOTL.IN.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,7.69
+data/world_bank/BZ/SI.POV.GINI.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,31.28
+data/world_bank/BZ/FP.CPI.TOTL.ZG.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,5.38
+data/world_bank/BZ/ST.INT.RCPT.CD.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,15.9
+data/world_bank/BZ/SH.IMM.MEAS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,5.38
+data/world_bank/BZ/SL.UEM.1524.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,7.95
+data/world_bank/BZ/GC.XPN.TOTL.GD.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,9.49
+data/world_bank/BZ/NV.IND.TOTL.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,4.87
+data/world_bank/BZ/IT.NET.USER.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,9.49
+data/world_bank/BZ/BN.CAB.XOKA.GD.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,6.15
+data/world_bank/BZ/NV.AGR.TOTL.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,4.87
+data/world_bank/BZ/SL.TLF.CACT.FE.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,7.69
+data/world_bank/BZ/NE.EXP.GNFS.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,5.38
+data/world_bank/BZ/SH.XPD.CHEX.GD.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,10.77
+data/world_bank/BZ/SP.POP.TOTL.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,0.0
+data/world_bank/BZ/SE.PRM.CMPT.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,9.74
+data/world_bank/BZ/ST.INT.ARVL.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,10.0
+data/world_bank/BZ/SE.SEC.ENRR.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,8.46
+data/world_bank/BZ/NE.GDI.TOTL.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,5.38
+data/world_bank/BZ/SE.ADT.LITR.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,15.9
+data/world_bank/BZ/EG.ELC.ACCS.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,8.21
+data/world_bank/BZ/SP.DYN.LE00.IN.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,0.26
+data/world_bank/BZ/SE.TER.ENRR.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,9.74
+data/world_bank/BZ/SP.URB.TOTL.IN.ZS.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,0.0
+data/world_bank/BZ/SP.DYN.TFRT.IN.csv,65,"['country', 'iso2c', 'year', 'indicator', 'value', 'unit']",0,16.92
