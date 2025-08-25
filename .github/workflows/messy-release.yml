@@ -61,16 +61,10 @@ jobs:
           if [ ! -f "data/messy/belize-messy-bundle.zip" ]; then
             echo "Bundle missing; creating from current messy outputs"
             cd data/messy
-            # zip manifest/report/dataset card + raw (ignore if some missing)
             zip -r belize-messy-bundle.zip _manifest.json _report.json _dataset_card.md raw || true
             cd - >/dev/null
           fi
-          if [ ! -f "data/messy/belize-messy-bundle.zip" ]; then
-            echo "ERROR: belize-messy-bundle.zip still not found"
-            find data/messy -maxdepth 3 -type f -printf "%p\n" || true
-            exit 1
-          fi
-          echo "DEBUG: bundle found"
+          [ -f "data/messy/belize-messy-bundle.zip" ]
           ls -lh data/messy/belize-messy-bundle.zip
 
       - name: Compute tag/title/prerelease
@@ -106,7 +100,7 @@ jobs:
             git push origin "$TAG"
           fi
 
-      # Publish to Pages under /data/messy/<TAG>/
+      # Publish to Pages under /data/messy/<TAG>/ and set messy/latest.json
       - name: Checkout gh-pages
         uses: actions/checkout@v4
         with:
@@ -114,18 +108,18 @@ jobs:
           path: ghp
           fetch-depth: 0
 
-      - name: Stage messy files to Pages
+      - name: Stage messy files to Pages (and set latest pointer)
         env:
           TAG: ${{ steps.meta.outputs.tag }}
         run: |
           set -euxo pipefail
           mkdir -p "ghp/data/messy/${TAG}"
           rsync -a "data/messy/" "ghp/data/messy/${TAG}/"
-          # keep Pages static pipeline from filtering files
           touch ghp/.nojekyll
-          # small index for the tag
           ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           printf '{\n  "tag": "%s",\n  "published_at": "%s"\n}\n' "$TAG" "$ts" > "ghp/data/messy/${TAG}/_index.json"
+          # === NEW: messy latest pointer ===
+          printf '{\n  "tag": "%s",\n  "published_at": "%s"\n}\n' "$TAG" "$ts" > "ghp/data/messy/latest.json"
 
           echo "DEBUG: staged messy counts"
           echo "files: $(find ghp/data/messy/${TAG} -type f | wc -l)"
@@ -134,7 +128,7 @@ jobs:
           git config user.email "github-actions@github.com"
           git add -A
           git status --porcelain
-          git commit -m "Publish Messy Data for ${TAG} to Pages" || echo "No changes to commit"
+          git commit -m "Publish Messy Data for ${TAG} to Pages (+ set messy/latest.json)" || echo "No changes to commit"
           git push
 
       - name: Upload messy snapshot (debug)
@@ -144,6 +138,7 @@ jobs:
           path: |
             data/messy/
             ghp/data/messy/${{ steps.meta.outputs.tag }}/
+            ghp/data/messy/latest.json
 
       - name: Package ZIP + small assets + checksums
         run: |
