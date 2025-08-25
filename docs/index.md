@@ -23,6 +23,15 @@ A full list of extracted datasets is maintained in `catalog.yml`.
 
 ### Associated files
 Several information files have been created:
-- Brief data dictionary for the extracted files: `data/world_bank/_dictionary.csv`
-- Manifests: `data/world_bank/_manifest.json`, `data/faostat_fbs/_manifest.json`
-- Example quality report, lists percent compleness for each extracted indicator: `data/_quality_report.json|csv`
+- Brief variable-level data dictionary for the extracted World Bank files: `data/world_bank/_dictionary.csv`
+- Manifests, providing basic extraction metadata: `data/world_bank/_manifest.json`, `data/faostat_fbs/_manifest.json`
+- An example quality report, listing percent completeness for each extracted indicator: `data/_quality_report.json|csv`
+
+### Data Availability
+Datasets are available in two ways:
+
+#### Repository 
+The full data package as a `.zip` file - containing all datasets - is available via versioned repository releases.
+
+#### Website download
+Individual datasets can be downloaded from this website - via the [download](downloads.md) page.
