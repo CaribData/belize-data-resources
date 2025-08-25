@@ -3,6 +3,5 @@ theme:
   name: material
 nav:
   - Home: index.md
-  - Messy Data: messy.md
   - Downloads: downloads.md
 repo_url: https://github.com/CaribData/open-data-caribbean
