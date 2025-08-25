@@ -1,0 +1,89 @@
+{
+  "generated_at": "2025-08-25T11:02:23Z",
+  "items": [
+    {
+      "slug": "sib_health_death_causes_2021",
+      "name": "SIB \u2013 Leading Causes of Death, 2021",
+      "source": "Statistical Institute of Belize",
+      "license": "Public domain/official stats (verify page terms)",
+      "original_url": "https://sib.org.bz/statistics/other-statistics/health-statistics/",
+      "resolved_download_url": "https://sib.org.bz/wp-content/uploads/AdministrativeHealthStatistics2021.xlsx",
+      "saved_path": "data/messy/raw/sib_health_death_causes_2021/AdministrativeHealthStatistics2021.xlsx",
+      "size_bytes": 28193,
+      "sha1": "e2a0c3da6a42003e7bae0b65fb214fea6d91634f",
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    {
+      "slug": "sib_secondary_education_2021_22",
+      "name": "SIB \u2013 Secondary Education Statistics 2021/22",
+      "source": "Statistical Institute of Belize",
+      "license": "Public domain/official stats (verify page terms)",
+      "original_url": "https://sib.org.bz/statistics/other-statistics/education-statistics/",
+      "resolved_download_url": "https://sib.org.bz/wp-content/uploads/PreSchoolEducation_2021-2022.xlsx",
+      "saved_path": "data/messy/raw/sib_secondary_education_2021_22/PreSchoolEducation_2021-2022.xlsx",
+      "size_bytes": 75525,
+      "sha1": "0f527e32ae2f0c506e44ce6efffc82a7a6e384bc",
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    {
+      "slug": "cbb_monetary_survey",
+      "name": "Central Bank \u2013 Monetary Survey (Banking System)",
+      "source": "Central Bank of Belize",
+      "license": "\u00a9 Central Bank \u2014 public stats",
+      "original_url": "https://www.centralbank.org.bz/home/statistics/banking-system/monetary-survey",
+      "resolved_download_url": "https://www.centralbank.org.bz/docs/default-source/3.1-banking-system/t1---monetary-surveyd85aa307-350e-4de8-9e5e-1b709649725e.xlsx?sfvrsn=df60739e_65",
+      "saved_path": "data/messy/raw/cbb_monetary_survey/t1---monetary-surveyd85aa307-350e-4de8-9e5e-1b709649725e.xlsx",
+      "size_bytes": 115194,
+      "sha1": "3542b9f50302e07dad4157ab3422fa7579e67f73",
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    {
+      "slug": "cbb_gdp_by_expenditure_current",
+      "name": "Central Bank \u2013 GDP by Expenditure (Current Prices)",
+      "source": "Central Bank of Belize",
+      "license": "\u00a9 Central Bank \u2014 public stats",
+      "original_url": "https://www.centralbank.org.bz/home/statistics/national-accounts/gross-domestic-product-by-expenditure---current-prices",
+      "resolved_download_url": "https://www.centralbank.org.bz/docs/default-source/3.7-national-accounts/3.6.5-gdp-by-expenditure-current-prices/t45---gdp-by-expenditure-current-prices.xlsx?sfvrsn=540cf63c_26",
+      "saved_path": "data/messy/raw/cbb_gdp_by_expenditure_current/t45---gdp-by-expenditure-current-prices.xlsx",
+      "size_bytes": 24591,
+      "sha1": "b6066c746a32996c46eba8546681415e3ddb682f",
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    {
+      "slug": "moa_production_stats_2003",
+      "name": "Ministry of Agriculture \u2013 Production Stats 2003",
+      "source": "Ministry of Agriculture",
+      "license": "\u00a9 Ministry of Agriculture \u2014 public stats",
+      "original_url": "https://www.agriculture.gov.bz/wp-content/uploads/2020/11/prodstats03Rev.xlsx",
+      "resolved_download_url": "https://www.agriculture.gov.bz/wp-content/uploads/2020/11/prodstats03Rev.xlsx",
+      "saved_path": "data/messy/raw/moa_production_stats_2003/prodstats03Rev.xlsx",
+      "size_bytes": 54794,
+      "sha1": "e4b0a16575f490b2bffb9226b4974f9cc4da2b14",
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    {
+      "slug": "sib_tourism_statistics",
+      "name": "SIB \u2013 Tourism Statistics (xlsx)",
+      "source": "Statistical Institute of Belize",
+      "license": "Public domain/official stats (verify page terms)",
+      "original_url": "https://sib.org.bz/wp-content/uploads/TourismStatistics.xlsx",
+      "resolved_download_url": "https://sib.org.bz/wp-content/uploads/TourismStatistics.xlsx",
+      "saved_path": "data/messy/raw/sib_tourism_statistics/TourismStatistics.xlsx",
+      "size_bytes": 884607,
+      "sha1": "cf329c03bec8fdb7ca6f7f74d3afccf314076fff",
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    {
+      "slug": "cbb_key_tourism_indicators",
+      "name": "Central Bank \u2013 Key Tourism Indicators (xlsx via page)",
+      "source": "Central Bank of Belize",
+      "license": "\u00a9 Central Bank \u2014 public stats",
+      "original_url": "https://www.centralbank.org.bz/home/statistics/general-statistics/key-tourism-indicators-%282001-2024%29",
+      "resolved_download_url": "https://www.centralbank.org.bz/docs/default-source/3.9-general-statistics/3.8.2-key-tourism-indicators-(2001-2023)/key-tourism-indicators-table.xlsx?sfvrsn=62cb3cfd_18",
+      "saved_path": "data/messy/raw/cbb_key_tourism_indicators/key-tourism-indicators-table.xlsx",
+      "size_bytes": 57218,
+      "sha1": "171cfeb56c948bf5826bda923b95dc8bacec8993",
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    }
+  ]
+}
