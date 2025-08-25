@@ -272,6 +272,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="What’s included">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#associated-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      Associated files
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -403,6 +427,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="What’s included">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#associated-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      Associated files
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -425,25 +473,29 @@
 
 
 <h1 id="caribdata-open-data-caribbean">CaribData Open Data — Caribbean</h1>
-<p>This small site lists a few example datasets pulled from openly available internet sources. </p>
+<p>This micro-site lists a few example datasets pulled from openly available internet sources. </p>
 <p>The data are mostly pulled from the World Bank and the Food and Agriculture Organization (FAO) open data repositories. 
-All sources are extracted automatically, with a weekly check made for data source updates. 
-Data have been extracted for our four partner countries: </p>
+All data sources are extracted automatically, with a weekly check made for data source updates. </p>
+<p>Data have been extracted for each our four partner countries: </p>
 <ul>
 <li>Belize (BZ),</li>
 <li>Guyana (GY).</li>
 <li>Jamaica (JM), and </li>
 <li>Trinidad &amp; Tobago (TT).</li>
 </ul>
-<p>Change countries &amp; indicators in <code>catalog.yml</code></p>
+<p>A full list of extracted datasets is maintained in <code>catalog.yml</code>.</p>
 <h2 id="whats-included">What’s included</h2>
+<h3 id="data">Data</h3>
 <ul>
 <li>World Bank per-country CSVs under <code>data/world_bank/&lt;ISO2&gt;/</code></li>
-<li>FAOSTAT FBS per-country CSVs under <code>data/faostat_fbs/</code></li>
-<li>Indicator dictionary: <code>data/world_bank/_dictionary.csv</code></li>
-<li>Manifests: <code>data/world_bank/_manifest.json</code>, <code>data/faostat_fbs/_manifest.json</code></li>
-<li>Quality: <code>data/_quality_report.json|csv</code></li>
+<li>FAOSTAT Food and Balance Sheets per-country CSVs under <code>data/faostat_fbs/</code></li>
+<li>Selected 'messy' datasets for Belize under <code>data/messy/</code></li>
 </ul>
+<h3 id="associated-files">Associated files</h3>
+<p>Several information files have been created:
+- Brief data dictionary for the extracted files: <code>data/world_bank/_dictionary.csv</code>
+- Manifests: <code>data/world_bank/_manifest.json</code>, <code>data/faostat_fbs/_manifest.json</code>
+- Example quality report, lists percent compleness for each extracted indicator: <code>data/_quality_report.json|csv</code></p>
 
 
 
