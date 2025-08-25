@@ -5,12 +5,7 @@ This micro-site lists a few example datasets pulled from openly available intern
 The data are mostly pulled from the World Bank and the Food and Agriculture Organization (FAO) open data repositories. 
 All data sources are extracted automatically, with a weekly check made for data source updates. 
 
-Data have been extracted for each our four partner countries: 
-
-- Belize (BZ),
-- Guyana (GY).
-- Jamaica (JM), and 
-- Trinidad & Tobago (TT).
+Data have been extracted for Belize(BZ).
 
 A full list of extracted datasets is maintained in `catalog.yml`.
 
@@ -23,6 +18,7 @@ A full list of extracted datasets is maintained in `catalog.yml`.
 
 ### Associated files
 Several information files have been created:
+
 - Brief variable-level data dictionary for the extracted World Bank files: `data/world_bank/_dictionary.json|csv`
 - Manifests, providing basic extraction metadata: `data/world_bank/_manifest.json`, `data/faostat_fbs/_manifest.json`
 - An example quality report, listing percent completeness for each extracted indicator: `data/_quality_report.json|csv`
