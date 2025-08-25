@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-Generate docs/downloads.md with per-file HTTP links and short descriptions.
+Generate docs/downloads.md with per-file HTTP links + short descriptions.
 
-- Reads data already published on gh-pages under ghp/data/...
-- Adds World Bank indicator names from world_bank/_dictionary.csv
-- Also links to the GitHub Release for each tag
-- Safe: stdlib only
+- Uses files already on gh-pages under ghp/data/...
+- Adds WB indicator names from world_bank/_dictionary.csv
+- Shows ONLY the latest Open Data (od-) and Messy (md-) releases
+- Release links go to GitHub (https://github.com/<org>/<repo>/releases/tag/<tag>)
 """
 import os, re, json, csv, pathlib
 from urllib.parse import quote
 
-GHP = pathlib.Path("ghp")           # checked-out gh-pages path (see docs.yml)
+GHP = pathlib.Path("ghp")
 BASE = GHP / "data"
 OUT  = pathlib.Path("docs") / "downloads.md"
 
@@ -19,32 +19,33 @@ REPO  = os.environ.get("GITHUB_REPOSITORY", "CaribData/open-data-caribbean").spl
 REPO_FULL = f"{OWNER}/{REPO}"
 BASE_URL = f"https://{OWNER}.github.io/{REPO}"
 
-def url(path: pathlib.Path) -> str:
-    """
-    Build a Pages URL for a file under ghp/data/... .
-    NOTE: path.relative_to(GHP) already starts with 'data/...', so DO NOT prefix 'data/' again.
-    """
-    rel = path.relative_to(GHP).as_posix()  # e.g. 'data/od-v2025-08-25-v2/faostat_fbs/BLZ_fbs.csv'
+def pages_url(path: pathlib.Path) -> str:
+    # path is under ghp/..., typically ghp/data/<...>
+    rel = path.relative_to(GHP).as_posix()  # already starts with 'data/...'
     return f"{BASE_URL}/{quote(rel, safe='/')}"
 
-def latest_tag() -> str:
+def release_url(tag: str) -> str:
+    return f"https://github.com/{REPO_FULL}/releases/tag/{tag}"
+
+def latest_od_tag() -> str:
+    """Prefer data/latest.json; fallback to newest dir starting with 'od-' or 'v'."""
     lj = BASE / "latest.json"
     if lj.exists():
         try:
-            return (json.loads(lj.read_text(encoding="utf-8")).get("tag") or "").strip()
+            tag = (json.loads(lj.read_text(encoding="utf-8")).get("tag") or "").strip()
+            if tag: return tag
         except Exception:
             pass
-    tags = [p.name for p in BASE.iterdir() if p.is_dir() and re.match(r"^(v|od-)", p.name)]
+    tags = [p.name for p in BASE.iterdir() if p.is_dir() and re.match(r"^(od-|v)", p.name)]
     return sorted(tags)[-1] if tags else ""
 
-def latest_messy_tag() -> str:
+def latest_md_tag() -> str:
     root = BASE / "messy"
     if not root.exists(): return ""
-    tags = [p.name for p in root.iterdir() if p.is_dir()]
+    tags = [p.name for p in root.iterdir() if p.is_dir() and p.name.startswith("md-")]
     return sorted(tags)[-1] if tags else ""
 
 def read_dictionary(dict_csv: pathlib.Path) -> dict:
-    """Return {indicator_code: indicator_name}."""
     m = {}
     if not dict_csv.exists(): return m
     with open(dict_csv, "r", encoding="utf-8-sig", newline="") as f:
@@ -67,23 +68,33 @@ def read_dictionary(dict_csv: pathlib.Path) -> dict:
         m[code] = name
     return m
 
-def build():
+def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    tag  = latest_tag()
-    mtag = latest_messy_tag()
+    od_tag = latest_od_tag()
+    md_tag = latest_md_tag()
 
     lines = []
     lines.append("# Downloads\n")
 
-    # -------- Open Data --------
-    if tag and (BASE/tag).exists():
-        lines.append(f"## Open Data — Latest: `{tag}`\n")
-        # Quick pointers
-        latest_json = BASE / "latest.json"
-        if latest_json.exists():
-            lines.append(f"_Latest marker:_ [{latest_json.name}]({url(latest_json)})")
-        lines.append(f"_Release:_ https://github.com/{REPO_FULL}/releases/tag/{tag}")
-        lines.append(f"_Folder on Pages:_ {BASE_URL}/data/{tag}/\n")
+    # ===== Latest releases summary =====
+    lines.append("## Latest Releases\n")
+    if od_tag and (BASE / od_tag).exists():
+        lines.append(f"- **Open Data** — `{od_tag}` · "
+                     f"[Files]({BASE_URL}/data/{od_tag}/) · "
+                     f"[Release]({release_url(od_tag)})")
+    else:
+        lines.append("- **Open Data** — *(not published yet)*")
+    if md_tag and (BASE / "messy" / md_tag).exists():
+        lines.append(f"- **Messy Data (Belize)** — `{md_tag}` · "
+                     f"[Files]({BASE_URL}/data/messy/{md_tag}/) · "
+                     f"[Release]({release_url(md_tag)})")
+    else:
+        lines.append("- **Messy Data (Belize)** — *(not published yet)*")
+    lines.append("")
+
+    # ===== Open Data (latest only) =====
+    if od_tag and (BASE/od_tag).exists():
+        lines.append(f"## Open Data — Latest: `{od_tag}`\n")
 
         # Quick assets
         quick = [
@@ -95,13 +106,13 @@ def build():
             "faostat_fbs/_manifest.json",
         ]
         for p in quick:
-            fp = BASE / tag / p
+            fp = BASE / od_tag / p
             if fp.exists():
-                lines.append(f"- [{p}]({url(fp)})")
+                lines.append(f"- [{p}]({pages_url(fp)})")
         lines.append("")
 
-        # World Bank CSVs + descriptions
-        wb_root = BASE / tag / "world_bank"
+        # World Bank CSVs with descriptions
+        wb_root = BASE / od_tag / "world_bank"
         dmap = read_dictionary(wb_root / "_dictionary.csv")
         if wb_root.exists():
             lines.append("### World Bank CSVs")
@@ -111,62 +122,51 @@ def build():
                     code = f.stem
                     desc = dmap.get(code, "")
                     if desc:
-                        lines.append(f"  - [{f.name}]({url(f)}) — {desc}")
+                        lines.append(f"  - [{f.name}]({pages_url(f)}) — {desc}")
                     else:
-                        lines.append(f"  - [{f.name}]({url(f)})")
+                        lines.append(f"  - [{f.name}]({pages_url(f)})")
             lines.append("")
 
         # FAOSTAT FBS CSVs
-        fbs_root = BASE / tag / "faostat_fbs"
+        fbs_root = BASE / od_tag / "faostat_fbs"
         if fbs_root.exists():
             lines.append("### FAOSTAT FBS CSVs")
             for f in sorted(fbs_root.glob("*_fbs.csv")):
                 iso3 = f.name[:-8] if f.name.endswith("_fbs.csv") else ""
-                lines.append(f"- [{f.name}]({url(f)}) — FAOSTAT Food Balance Sheets ({iso3})")
+                lines.append(f"- [{f.name}]({pages_url(f)}) — FAOSTAT Food Balance Sheets ({iso3})")
             lines.append("")
     else:
         lines.append("## Open Data — (no published tag found yet)\n")
 
-    # -------- Messy --------
+    # ===== Messy Data (latest only) =====
     lines.append("## Messy Data (Belize)")
-    mroot = BASE / "messy" / mtag if mtag else None
+    mroot = BASE / "messy" / md_tag if md_tag else None
     if mroot and mroot.exists():
-        lines.append(f"_Latest messy tag:_ `{mtag}`")
-        lines.append(f"_Folder on Pages:_ {BASE_URL}/data/messy/{mtag}/")
-        lines.append(f"_Release:_ https://github.com/{REPO_FULL}/releases/tag/{mtag}\n")
+        lines.append(f"_Latest messy tag:_ `{md_tag}` · "
+                     f"[Files]({BASE_URL}/data/messy/{md_tag}/) · "
+                     f"[Release]({release_url(md_tag)})\n")
         for p in ["_manifest.json","_report.json","_dataset_card.md"]:
             fp = mroot / p
             if fp.exists():
-                lines.append(f"- [{p}]({url(fp)})")
+                lines.append(f"- [{p}]({pages_url(fp)})")
         lines.append("")
         raw = mroot / "raw"
         if raw.exists():
             lines.append("### Raw files")
-            for slug_name in sorted([p.name for p in raw.iterdir() if p.is_dir()]):
-                lines.append(f"- **{slug_name}**")
-                slug_dir = raw / slug_name
+            for slug_dir in sorted([p for p in raw.iterdir() if p.is_dir()]):
+                lines.append(f"- **{slug_dir.name}**")
                 for f in sorted(slug_dir.rglob("*")):
                     if f.is_file() and f.suffix.lower() in [".xlsx",".xls",".csv"]:
-                        lines.append(f"  - [{f.name}]({url(f)})")
+                        lines.append(f"  - [{f.name}]({pages_url(f)})")
             lines.append("")
     else:
         lines.append("_No messy data published yet._\n")
 
-    # -------- All tags --------
-    tags = [p.name for p in BASE.iterdir() if p.is_dir() and re.match(r"^(v|od-)", p.name)]
-    if tags:
-        lines.append("## All Open Data tags")
-        for t in sorted(tags):
-            pages = f"{BASE_URL}/data/{t}/"
-            rel   = f"https://github.com/{REPO_FULL}/releases/tag/{t}"
-            lines.append(f"- **{t}** — [files]({pages}) · [release]({rel})")
-        lines.append("")
-
     OUT.write_text("\n".join(lines), encoding="utf-8")
     print(f"Wrote {OUT} ({len(lines)} lines)")
     print("--- preview ---")
-    for line in lines[:30]:
+    for line in lines[:25]:
         print(line)
 
 if __name__ == "__main__":
-    build()
+    main()
