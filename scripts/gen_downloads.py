@@ -92,10 +92,9 @@ def build():
         dmap = read_dictionary(wb_root / "_dictionary.csv")
         if wb_root.exists():
             lines.append("### World Bank CSVs")
-            for country in sorted([p.name for p in wb_root.iterdir() if p.is_dir()]):
-                lines.append(f"- **{country}**")
-                cdir = wb_root / country
-                for f in sorted(cdir.glob("*.csv")):
+            for country_dir in sorted([p for p in wb_root.iterdir() if p.is_dir()]):
+                lines.append(f"- **{country_dir.name}**")
+                for f in sorted(country_dir.glob("*.csv")):
                     code = f.stem
                     desc = dmap.get(code, "")
                     if desc:
@@ -128,9 +127,10 @@ def build():
         raw = mroot / "raw"
         if raw.exists():
             lines.append("### Raw files")
-            for slug in sorted([p.name for p in raw.iterdir() if p.is_dir()]):
-                lines.append(f"- **{slug}**")
-                for f in sorted(raw/slug.glob("**/*")):
+            for slug_name in sorted([p.name for p in raw.iterdir() if p.is_dir()]):
+                lines.append(f"- **{slug_name}**")
+                slug_dir = raw / slug_name            # <-- build the path first
+                for f in sorted(slug_dir.rglob("*")): # <-- then glob (no precedence issues)
                     if f.is_file() and f.suffix.lower() in [".xlsx",".xls",".csv"]:
                         lines.append(f"  - [{f.name}]({url(f)})")
             lines.append("")
@@ -147,9 +147,9 @@ def build():
 
     OUT.write_text("\n".join(lines), encoding="utf-8")
     print(f"Wrote {OUT} ({len(lines)} lines)")
-    # Show a preview
     print("--- preview ---")
-    print("\n".join(lines[:30]))
+    for line in lines[:30]:
+        print(line)
 
 if __name__ == "__main__":
     build()
