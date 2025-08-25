@@ -23,7 +23,7 @@ A full list of extracted datasets is maintained in `catalog.yml`.
 
 ### Associated files
 Several information files have been created:
-- Brief variable-level data dictionary for the extracted World Bank files: `data/world_bank/_dictionary.csv`
+- Brief variable-level data dictionary for the extracted World Bank files: `data/world_bank/_dictionary.json|csv`
 - Manifests, providing basic extraction metadata: `data/world_bank/_manifest.json`, `data/faostat_fbs/_manifest.json`
 - An example quality report, listing percent completeness for each extracted indicator: `data/_quality_report.json|csv`
 
