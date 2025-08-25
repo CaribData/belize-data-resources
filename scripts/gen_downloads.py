@@ -142,7 +142,7 @@ def build():
     if tags:
         lines.append("## All Open Data tags")
         for t in sorted(tags):
-            lines.append(f"- [{t}]({BASE_URL}/releases/tag/{t}/)")
+            lines.append(f"- [{t}](github.com/CaribData/open-data-caribbean/releases/tag/{t}/)")
         lines.append("")
 
     OUT.write_text("\n".join(lines), encoding="utf-8")
