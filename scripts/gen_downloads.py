@@ -4,6 +4,7 @@ Generate docs/downloads.md with per-file HTTP links and short descriptions.
 
 - Reads data already published on gh-pages under ghp/data/...
 - Adds World Bank indicator names from world_bank/_dictionary.csv
+- Also links to the GitHub Release for each tag
 - Safe: stdlib only
 """
 import os, re, json, csv, pathlib
@@ -11,15 +12,19 @@ from urllib.parse import quote
 
 GHP = pathlib.Path("ghp")           # checked-out gh-pages path (see docs.yml)
 BASE = GHP / "data"
-OUT = pathlib.Path("docs") / "downloads.md"
+OUT  = pathlib.Path("docs") / "downloads.md"
 
 OWNER = os.environ.get("GITHUB_REPOSITORY_OWNER", "CaribData")
 REPO  = os.environ.get("GITHUB_REPOSITORY", "CaribData/open-data-caribbean").split("/", 1)[1]
+REPO_FULL = f"{OWNER}/{REPO}"
 BASE_URL = f"https://{OWNER}.github.io/{REPO}"
 
 def url(path: pathlib.Path) -> str:
-    # Keep slashes, encode spaces/specials
-    rel = "data/" + str(path.relative_to(GHP)).replace("\\", "/")
+    """
+    Build a Pages URL for a file under ghp/data/... .
+    NOTE: path.relative_to(GHP) already starts with 'data/...', so DO NOT prefix 'data/' again.
+    """
+    rel = path.relative_to(GHP).as_posix()  # e.g. 'data/od-v2025-08-25-v2/faostat_fbs/BLZ_fbs.csv'
     return f"{BASE_URL}/{quote(rel, safe='/')}"
 
 def latest_tag() -> str:
@@ -73,6 +78,14 @@ def build():
     # -------- Open Data --------
     if tag and (BASE/tag).exists():
         lines.append(f"## Open Data — Latest: `{tag}`\n")
+        # Quick pointers
+        latest_json = BASE / "latest.json"
+        if latest_json.exists():
+            lines.append(f"_Latest marker:_ [{latest_json.name}]({url(latest_json)})")
+        lines.append(f"_Release:_ https://github.com/{REPO_FULL}/releases/tag/{tag}")
+        lines.append(f"_Folder on Pages:_ {BASE_URL}/data/{tag}/\n")
+
+        # Quick assets
         quick = [
             "_freshness.json",
             "_quality_report.csv",
@@ -118,7 +131,9 @@ def build():
     lines.append("## Messy Data (Belize)")
     mroot = BASE / "messy" / mtag if mtag else None
     if mroot and mroot.exists():
-        lines.append(f"_Latest messy tag:_ `{mtag}`\n")
+        lines.append(f"_Latest messy tag:_ `{mtag}`")
+        lines.append(f"_Folder on Pages:_ {BASE_URL}/data/messy/{mtag}/")
+        lines.append(f"_Release:_ https://github.com/{REPO_FULL}/releases/tag/{mtag}\n")
         for p in ["_manifest.json","_report.json","_dataset_card.md"]:
             fp = mroot / p
             if fp.exists():
@@ -129,8 +144,8 @@ def build():
             lines.append("### Raw files")
             for slug_name in sorted([p.name for p in raw.iterdir() if p.is_dir()]):
                 lines.append(f"- **{slug_name}**")
-                slug_dir = raw / slug_name            # <-- build the path first
-                for f in sorted(slug_dir.rglob("*")): # <-- then glob (no precedence issues)
+                slug_dir = raw / slug_name
+                for f in sorted(slug_dir.rglob("*")):
                     if f.is_file() and f.suffix.lower() in [".xlsx",".xls",".csv"]:
                         lines.append(f"  - [{f.name}]({url(f)})")
             lines.append("")
@@ -142,7 +157,9 @@ def build():
     if tags:
         lines.append("## All Open Data tags")
         for t in sorted(tags):
-            lines.append(f"- [{t}](github.com/CaribData/open-data-caribbean/releases/tag/{t}/)")
+            pages = f"{BASE_URL}/data/{t}/"
+            rel   = f"https://github.com/{REPO_FULL}/releases/tag/{t}"
+            lines.append(f"- **{t}** — [files]({pages}) · [release]({rel})")
         lines.append("")
 
     OUT.write_text("\n".join(lines), encoding="utf-8")
