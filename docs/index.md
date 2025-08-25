@@ -1,9 +1,17 @@
 # CaribData Open Data — Caribbean
 
-Automated pull of World Bank indicators and FAOSTAT FBS for BZ, JM, TT, GY.
+This small site lists a few example datasets pulled from openly available internet sources. 
 
-- Change countries & indicators in `catalog.yml`
-- Freshness: <!--FRESHNESS-->Last updated: (pending)<!--/FRESHNESS-->
+The data are mostly pulled from the World Bank and the Food and Agriculture Organization (FAO) open data repositories. 
+All sources are extracted automatically, with a weekly check made for data source updates. 
+Data have been extracted for our four partner countries: 
+
+- Belize (BZ),
+- Guyana (GY).
+- Jamaica (JM), and 
+- Trinidad & Tobago (TT).
+
+Change countries & indicators in `catalog.yml`
 
 ## What’s included
 - World Bank per-country CSVs under `data/world_bank/<ISO2>/`
