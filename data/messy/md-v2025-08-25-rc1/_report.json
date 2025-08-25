@@ -1,0 +1,141 @@
+{
+  "generated_at": "2025-08-25T09:27:51Z",
+  "files": [
+    {
+      "slug": "sib_health_death_causes_2021",
+      "name": "SIB \u2013 Leading Causes of Death, 2021",
+      "analysis": {
+        "type": "excel",
+        "sheets": [
+          "3.1 H"
+        ],
+        "merged_cells": {},
+        "header_row_guess": {},
+        "notes": [
+          "openpyxl error: object of type 'MultiCellRange' has no len()"
+        ]
+      },
+      "expected_issues": [
+        "merged_cells",
+        "header_rows",
+        "sheet_notes"
+      ]
+    },
+    {
+      "slug": "sib_secondary_education_2021_22",
+      "name": "SIB \u2013 Secondary Education Statistics 2021/22",
+      "analysis": {
+        "type": "excel",
+        "sheets": [
+          "4.1 E"
+        ],
+        "merged_cells": {},
+        "header_row_guess": {},
+        "notes": [
+          "openpyxl error: object of type 'MultiCellRange' has no len()"
+        ]
+      },
+      "expected_issues": [
+        "multi_sheet",
+        "header_rows"
+      ]
+    },
+    {
+      "slug": "cbb_monetary_survey",
+      "name": "Central Bank \u2013 Monetary Survey (Banking System)",
+      "analysis": {
+        "type": "excel",
+        "sheets": [
+          "1977-2025"
+        ],
+        "merged_cells": {},
+        "header_row_guess": {},
+        "notes": [
+          "openpyxl error: object of type 'MultiCellRange' has no len()"
+        ]
+      },
+      "expected_issues": [
+        "footer_totals",
+        "stub_rows"
+      ]
+    },
+    {
+      "slug": "cbb_gdp_by_expenditure_current",
+      "name": "Central Bank \u2013 GDP by Expenditure (Current Prices)",
+      "analysis": {
+        "type": "excel",
+        "sheets": [
+          "GDP Exp Current 1980-89"
+        ],
+        "merged_cells": {},
+        "header_row_guess": {},
+        "notes": [
+          "openpyxl error: object of type 'MultiCellRange' has no len()"
+        ]
+      },
+      "expected_issues": [
+        "section_totals",
+        "header_rows"
+      ]
+    },
+    {
+      "slug": "moa_production_stats_2003",
+      "name": "Ministry of Agriculture \u2013 Production Stats 2003",
+      "analysis": {
+        "type": "excel",
+        "sheets": [
+          "A"
+        ],
+        "merged_cells": {},
+        "header_row_guess": {},
+        "notes": [
+          "openpyxl error: object of type 'MultiCellRange' has no len()"
+        ]
+      },
+      "expected_issues": [
+        "old_format",
+        "region_columns"
+      ]
+    },
+    {
+      "slug": "sib_tourism_statistics",
+      "name": "SIB \u2013 Tourism Statistics (xlsx)",
+      "analysis": {
+        "type": "excel",
+        "sheets": [
+          "Table 12.1"
+        ],
+        "merged_cells": {},
+        "header_row_guess": {},
+        "notes": [
+          "openpyxl error: object of type 'MultiCellRange' has no len()"
+        ]
+      },
+      "expected_issues": [
+        "notes_in_sheet",
+        "multi_table",
+        "header_rows"
+      ]
+    },
+    {
+      "slug": "cbb_key_tourism_indicators",
+      "name": "Central Bank \u2013 Key Tourism Indicators (xlsx via page)",
+      "analysis": {
+        "type": "excel",
+        "sheets": [
+          "Sheet1"
+        ],
+        "merged_cells": {},
+        "header_row_guess": {},
+        "notes": [
+          "openpyxl error: object of type 'MultiCellRange' has no len()"
+        ]
+      },
+      "expected_issues": [
+        "stub_rows",
+        "footnotes",
+        "section_totals"
+      ]
+    }
+  ]
+}
