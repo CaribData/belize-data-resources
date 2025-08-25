@@ -5,8 +5,10 @@ This micro-site lists a few example datasets pulled from openly available intern
 The data are mostly pulled from the World Bank and the Food and Agriculture Organization (FAO) open data repositories. 
 All data sources are extracted automatically, with a weekly check made for data source updates. 
 
-Data have been extracted for Belize(BZ).
-
+- World Bank data have been extracted for Belize (BZ)
+- Food Balance Sheets (FBS) from FAOSTAT have been extracted for Belize (BZ), Guyana (GY), Jamaica (JM), and Trinidad & Tobago (TT)
+- Selected 'messy' datasets have been extracted for Belize, from several government sources.
+- 
 A full list of extracted datasets is maintained in `catalog.yml`.
 
 ## What’s included
@@ -27,7 +29,7 @@ Several information files have been created:
 Datasets are available in two ways:
 
 #### Repository 
-The full data package as a `.zip` file - containing all datasets - is available via versioned repository releases.
+The full data package as a `.zip` file - containing all datasets - is available via versioned GitHub repository releases.
 
 #### Website download
 Individual datasets can be downloaded from this website - via the [download](downloads.md) page.
